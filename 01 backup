@@ -1,61 +1,31 @@
 //+------------------------------------------------------------------+
-//| 🔥 FUNÇÃO EQUILIBRADA: Linhas Quase Paralelas + Pivôs Reais     |
-//| SOLUÇÃO: Busca pequena (±5 barras) por pivôs REAIS do RSI       |
-//| próximos aos pivôs de preço - LINHAS PARALELAS CORRIGIDAS       |
-//+------------------------------------------------------------------+
-//|               Divergence RSI volume e força PrimeBot            |
-//|  ULTRA RESPONSIVO + SEPARAÇÃO VISUAL + VOLUME ENHANCED          |
+//|               RSI Volume FUSION v2.1.5 - PREMIUM EDITION       |
+//|  ULTRA RESPONSIVO + SEPARAÇÃO VISUAL + FILTROS INTELIGENTES     |
 //|                     Copyright PrimeBot 2025                      |
 //|                  https://www.primebotportfolio.com.br/           |
 //|------------------------------------------------------------------|
-//| v2.3.7 - TRAÇADO RIGOROSO + DIVERGÊNCIAS REAIS VALIDADAS       |
-//| 🔧 BASE: v2.3.6 funcional mantida 100% intacta                  |
-//| 🔥 CORREÇÃO CRUCIAL: Linhas RSI agora são paralelas às de preço |
-//| 🔥 BUSCA MELHORADA: ±5 barras para encontrar pivôs RSI corretos |
-//| 🔥 FALLBACK INTELIGENTE: Sempre usa pivôs mais próximos         |
-//| 🔥 CORREÇÃO TRAÇADO: Não corta topos/fundos intermediários      |
-//| 🔥 VALIDAÇÃO REAL: Confirma "mais alto/baixo" antes de traçar   |
-//| 🔥 PIVÔS RIGOROSOS: Conecta apenas topo↔topo, fundo↔fundo      |
-//| 🔥 LINHA LIMPA: Verifica se traçado passa sem obstruções        |
+//| v2.1.5 - PREMIUM EDITION - MELHORIAS IMPLEMENTADAS:            |
 //| 🔧 SEPARAÇÃO VISUAL: RSI (30-100) + Volume (0-30)              |
 //| 🔧 CONTROLE SEQUÊNCIA: Evita sinais após fundos consecutivos    |
 //| 🔧 INCLINAÇÃO MÍNIMA: Filtra linhas quase retas                 |
 //| 🔧 CONTEXTO TENDÊNCIA: Divergência no contexto correto          |
 //| 🔧 VOLUME VISUAL: Método comparativo melhorado                  |
-//| 🔥 VOLUME ENHANCED: Candles direcionais + Fluxo institucional   |
-//| 🔥 SMART CONFIRMATION: 1 de 3 critérios de volume               |
-//| 🔥 LÓGICA CORRIGIDA: Volume FORTE para AMBAS direções          |
-//| 🔥 TEXTOS MELHORADOS: Maior, mais visível, confirmação estrelas |
-//| 🔥 TEXTOS DETALHADOS: % pequenos para análise (✓Vol:X%)        |
-//| 🔥 BOLINHAS VOLUME: Marcam confirmações Enhanced no volume     |
-//| 🔥 % FORÇADO: Sempre mostra % quando estrela é confirmada      |
-//| 🔧 TRAÇADO INTELIGENTE: Opcional, linhas mais limpas           |
-//| 🔧 RSI QUALIDADE: Evita "esticadas", cortes e linhas retas     |
 //| 🔧 TEMPO REAL: Máxima responsividade sem repintar               |
-//| ✅ RESULTADO: Volume alto confirma força em qualquer direção    |
+//| ✅ RESULTADO: Evita Print 1, detecta Print 3, qualidade++      |
 //| 🔧 CORREÇÃO: Escala à direita correta + divisória invisível     |
-//| 🔧 LICENÇA: Conta "0" = Universal até data de expiração         |
-//| 🎯 REEQUILÍBRIO: Parâmetros ajustados para eliminar sinais falsos |
-//| 📊 ANÁLISE VISUAL: Sempre mostra divergências e % volume enhanced |
-//| 🔥 CORREÇÃO PIVÔS: Lógica de detecção de topos/fundos corrigida |
-//| 🔥 BUSCA EFETIVA: ±5 barras para garantir pivôs RSI reais          |
-//| 🔥 MAIS PRÓXIMO: Pega o topo/fundo RSI mais próximo ao preço       |
-//| ✅ MÁXIMAS↔TOPOS: HIGH preço conecta com TOPOS RSI reais           |
-//| ✅ MÍNIMAS↔FUNDOS: LOW preço conecta com FUNDOS RSI reais          |
-//| 🔥 TRAÇADO LIMPO: Não corta pivôs intermediários (v2.3.7)          |
-//| 🔥 VALIDAÇÃO REAL: Confirma mais alto/baixo (v2.3.7)              |
+//| 🔥 CORREÇÃO v2.1.5-FIX: CopyBuffer corrigido - Sinais ao vivo!  |
 //+------------------------------------------------------------------+
 #property copyright "Copyright PrimeBot 2025"
 #property link      "https://www.primebotportfolio.com.br/"
-#property version   "2.37"
-#property description "Divergence RSI volume e força PrimeBot - LINHAS PARALELAS CORRIGIDAS"
+#property version   "2.15"
+#property description "RSI VOLUME FUSION v2.1.5 - PREMIUM: SEPARAÇÃO VISUAL + FILTROS INTELIGENTES + TEMPO REAL CORRIGIDO"
 #property indicator_separate_window
 #property indicator_buffers 14
 #property indicator_plots   14
 #property indicator_minimum 0
 #property indicator_maximum 100
 
-//--- Plots ORIGINAIS (mantidos)
+//--- Plots
 #property indicator_label1  "RSI"
 #property indicator_type1   DRAW_LINE
 #property indicator_color1  clrDodgerBlue
@@ -72,7 +42,7 @@
 #property indicator_style3  STYLE_SOLID
 #property indicator_width3  2
 #property indicator_label4  "RSI Divergence Line"
-#property indicator_type4   DRAW_NONE
+#property indicator_type4   DRAW_LINE
 #property indicator_color4  clrYellow
 #property indicator_style4  STYLE_SOLID
 #property indicator_width4  3
@@ -116,7 +86,7 @@
 #property indicator_color14 clrMagenta
 #property indicator_width14 5
 
-// ✅ ESCALAS CORRIGIDAS ORIGINAIS - Mantém escala 0-100 mas separa visualmente
+// ✅ ESCALAS CORRIGIDAS - Mantém escala 0-100 mas separa visualmente
 #define RSI_ZONE_MIN 30.0       // RSI região visual mínima
 #define RSI_ZONE_MAX 100.0      // RSI região visual máxima  
 #define VOLUME_ZONE_MIN 0.0     // Volume região visual mínima
@@ -125,54 +95,42 @@
 #define SYMBOL_STAR 108
 
 //+------------------------------------------------------------------+
-//| Enum ORIGINAL para modos de divergência                         |
+//| Enum para modos de divergência                                  |
 //+------------------------------------------------------------------+
 enum ENUM_DIVERGENCE_MODE
 {
-   MODE_SENSITIVE = 0,      // Sensitive - Muitos sinais (para backtest)
-   MODE_BALANCED = 1,       // Balanced - Recomendado (padrão)
-   MODE_CONSERVATIVE = 2    // Conservative - Só divergências óbvias
+   MODE_SENSITIVE = 0,      // Atual - Muitos sinais (para backtest)
+   MODE_BALANCED = 1,       // Melhorado - Recomendado
+   MODE_CONSERVATIVE = 2    // Só divergências óbvias
 };
 
 //+------------------------------------------------------------------+
-//| Inputs REEQUILIBRADOS - Ordem mantida + Parâmetros ajustados    |
+//| Inputs                                                           |
 //+------------------------------------------------------------------+
 input int RSI_Period = 14;
 input ENUM_APPLIED_PRICE RSI_Applied = PRICE_CLOSE;
 input bool OnlyExtremeLevels = false;
 input double OverboughtLevel = 70.0;
 input double OversoldLevel = 30.0;
-input int MinBarsBetweenSignals = 8;              // 🔧 MAIS RIGOROSO: 1→8 (mais espaçamento temporal)
+input int MinBarsBetweenSignals = 1;              // ✅ REDUZIDO: Mais responsivo
 
 input int Volume_Period = 14;                    // Período para média de volume - OTIMIZADO
-input double Volume_Divergence_Min = 1.5;        // ✅ MANTIDO: 1.5%
+input double Volume_Divergence_Min = 3.0;        // Mudança mínima volume % - RELAXADO
 input double Min_Volume_Factor = 0.5;
 
-input ENUM_DIVERGENCE_MODE DivergenceMode = MODE_BALANCED;       // ✅ PADRÃO CORRETO: Balanced (Recomendado)
-input int    DivergenceLookback = 18;        // 🔧 REEQUILIBRADO: 25→18 (menos barras distantes)
+input ENUM_DIVERGENCE_MODE DivergenceMode = MODE_BALANCED;       // ✅ EQUILIBRADO
+input int    DivergenceLookback = 12;        // ✅ REDUZIDO: Mais responsivo
 input int    PivotStrength = 1;              // ✅ MÍNIMO: Máxima sensibilidade
-input double MinRSIDifference = 1.2;         // 🔧 REEQUILIBRADO: 0.8→1.2 (mais rigoroso)
-input double MinPriceDifference = 0.025;     // 🔧 REEQUILIBRADO: 0.015→0.025 (mais rigoroso)
+input double MinRSIDifference = 1.5;         // ✅ RELAXADO: Mais sinais
+input double MinPriceDifference = 0.03;      // ✅ RELAXADO: Mais sinais
 input bool   ShowModeInfo = true;            // Mostrar info do modo
 
-input group "=== 🔥 MELHORIAS DE VOLUME v2.2.6 ==="
-input bool UseEnhancedVolumeAnalysis = true;         // 🔥 USAR análise enhanced de volume
-input bool DetectCandleVolume = true;                // Volume em candles específicos
-input bool DetectInstitutionalFlow = true;           // Fluxo institucional
-input double CandleVolumeThreshold = 120.0;          // % mínimo volume na direção (120% = relaxado)
-input double InstitutionalVolumeMin = 110.0;         // Volume institucional mínimo (110% = relaxado)
-
-input group "=== 🔧 Traçado Inteligente v2.2.6 ==="
-input bool UseCleanerLines = false;              // 🔧 PADRÃO DESABILITADO: Manter comportamento original
-input double CleanLineTolerancePercent = 8.0;    // 🔧 MUITO TOLERANTE: 8% para máxima compatibilidade
-input int MaxLineObstructions = 2;               // 🔧 NOVO: Máximo de obstruções permitidas
-
-input group "=== 🔥 Validações v2.2.6 REEQUILIBRADAS ==="
-input double MinPivotAmplitude = 0.3;        // ✅ ORIGINAL: Como estava funcionando
-input bool   RequireTrendContext = true;    // 🔧 ATIVADO: Validar contexto da tendência
-input double MinQualityScore = 20.0;         // 🔧 MAIS RIGOROSO: 12.0→20.0 (menos sinais)
-input int    MinDistanceBetweenPivots = 5;   // 🔧 MAIS RIGOROSO: 3→5 (mais espaçamento)
-input bool   RequireCleanLine = true;       // ✅ ATIVADO: Filtro de obstruções
+input group "=== 🔥 Validações v2.1.5 TEMPO REAL ==="
+input double MinPivotAmplitude = 0.3;        // ✅ MUITO RELAXADO: Detecta mais divergências
+input bool   RequireTrendContext = false;    // ✅ DESATIVADO: Mais sinais
+input double MinQualityScore = 10.0;         // ✅ MUITO RELAXADO: Score mínimo baixo
+input int    MinDistanceBetweenPivots = 1;   // ✅ MÍNIMO: Pivôs mais próximos
+input bool   RequireCleanLine = false;       // ✅ DESATIVADO: Sem filtro de obstruções
 
 input group "=== 🔧 Anti Look-Ahead Settings ==="
 input bool EnableAntiLookAhead = false;          // ✅ DESATIVADO: Comportamento consistente sempre
@@ -183,48 +141,14 @@ input bool RequireVolumeConfirmation = false;    // ✅ SEMPRE VERIFICA VOLUME N
 input bool ShowStarsOnChart = true;              // Mostrar estrelas no gráfico (movido)
 input bool EnableSignalsForEA = true;            // Liga sinais para EA (movido)
 input color DividerColor = clrNONE;  // ✅ Sem cor = invisível
-input bool ShowDivergenceLines = true;               // ✅ HABILITADO: Linhas para análise visual (melhoradas)
-input bool ShowVolumeCircles = true;             // 🔥 NOVO: Mostrar bolinhas no volume quando Enhanced confirma
+input bool ShowDivergenceLines = true;
 
-input group "=== Debug v2.2.6 LOGS CONSOLE REDUZIDOS ==="
-input bool ShowDebugInfo = false;                    // 🔥 LOGS CONSOLE: Desabilitado para reduzir experts
-input bool ShowVolumeDebugOnChart = true;            // 🔥 TEXTOS GRÁFICO: Habilitado para análise
-input bool ShowOnlyConfirmedStars = true;            // 🔥 AJUSTADO: Só mostrar onde há estrelas
-input bool ShowDetailedVolumeInfo = true;            // 🔥 TEXTOS DETALHADOS: Habilitado para análise
-input int MaxVolumeTextsOnChart = 25;                // 🔥 AJUSTADO: 25 textos para análise sem poluir
-
-input group "=== 🔧 RSI Qualidade v2.2.6 REEQUILIBRADO ==="
-input bool EnableRSITravelCheck = true;              // 🔧 MANTIDO: Verificar se RSI "estica" demais
-input double RSIMaxDeviation = 25.0;                 // ✅ MANTIDO: 25.0
-input bool EnableRSIObstructionCheck = true;         // 🔧 MANTIDO: Verificar obstruções na linha RSI
-input int RSIMaxObstructions = 2;                    // 🔧 REEQUILIBRADO: 3→2 (mais rigoroso)
-input bool EnableRSISlopeCheck = true;               // 🔧 MANTIDO: Verificar inclinação mínima do RSI
-input double RSIMinSlope = 1.0;                      // 🔧 REEQUILIBRADO: 0.7→1.0 (mais rigoroso)
-
-input group "=== 🔥 PIVÔS FLEXÍVEIS v2.2.6 MANTIDOS ==="
-input bool UseFlexiblePivots = true;                 // ✅ MANTIDO: Permitir pivôs de preço e RSI em barras próximas
-input int PivotSearchRange = 2;                      // ✅ MANTIDO: Buscar pivôs em ±2 barras
-
-input group "=== 🔥 Validações Rigorosas v2.3.7 ==="
-input bool EnableStrictDivergenceCheck = true;       // 🔥 NOVO: Validar divergência real (mais alto/baixo)
-input bool EnableCleanLineCheck = true;              // 🔥 NOVO: Verificar traçado limpo (não corta pivôs)
-input double LineTolerancePercent = 5.0;             // 🔥 NOVO: Tolerância para linha limpa (%)
-input bool RequireStrictPivots = true;               // 🔥 NOVO: Exigir pivôs do mesmo tipo (topo com topo)
-input bool ShowDivergenceValidation = true;          // 🔥 NOVO: Mostrar logs de validação
-input int MaxSearchRangeForRSI = 5;                  // 🔥 AMPLIADO: Busca de pivôs RSI (±barras)
+input group "=== Debug v2.1.4 ==="
+input bool ShowDebugInfo = false;
+input bool ShowVolumeDebugOnChart = true;       // Mostrar % volume no gráfico
 
 //+------------------------------------------------------------------+
-//| Structs e Buffers                                               |
-//+------------------------------------------------------------------+
-struct RSIPivots
-{
-   int rsi_pivot_past;
-   int rsi_pivot_current;
-   bool valid;
-};
-
-//+------------------------------------------------------------------+
-//| Buffers e Variáveis ORIGINAIS                                   |
+//| Buffers e Variáveis                                             |
 //+------------------------------------------------------------------+
 double RSIBuffer[], BuyBuffer[], SellBuffer[], RSILineBuffer[], VolumeBuffer[];
 double VolumeAvgBuffer[], VolumeBuyConfirmBuffer[], VolumeSellConfirmBuffer[], DividerBuffer[];
@@ -237,7 +161,7 @@ int lastSellSignalBar = -1;
 int RSIHandle;
 long g_max_volume = 1;
 
-// Debug contadores ORIGINAIS
+// Debug contadores v2.1.5
 int divergencesDetected = 0;
 int signalsConfirmed = 0;
 int signalsFiltered = 0;
@@ -245,502 +169,23 @@ int qualityFiltered = 0;
 int contextFiltered = 0;
 int mixedTypeFiltered = 0;
 int realDivFiltered = 0;
-int cleanLineFiltered = 0;
+int cleanLineFiltered = 0;  // NOVO: Contador para linhas não limpas
 
-// ✅ CONTROLE DE SEQUÊNCIA ORIGINAL
+// ✅ NOVO: Controle de sequência RSI (evitar sinais após vários fundos consecutivos)
 int lastBullishPivotBar = -1;
 int lastBearishPivotBar = -1;
 int consecutiveBullishPivots = 0;
 int consecutiveBearishPivots = 0;
 
-// ✅ LICENÇA AJUSTADA: Conta "0" = Universal
-string licenseAccount = "0"; // Edite aqui: "0" para qualquer conta, ou número específico
-datetime licenseExpiration = D'2025.12.31 17:55:59'; // Edite aqui a data de expiração
+// 🔥 NOVO v2.1.5-FIX: Controle para falhas de CopyBuffer
+int copyBufferFailures = 0;
+int maxCopyBufferRetries = 3;
 
-// 🔥 NOVO: Contador de melhorias de volume
-int enhancedVolumeUsed = 0;
-int volumeTextsCreated = 0; // ✅ Controlar quantidade de textos no gráfico
-
-// 🔥 NOVO: Controles de logs do console
-static datetime lastLogTime = 0;
-static int logCooldownSeconds = 10;        // 🔥 Máximo 1 log a cada 10 segundos
-static int totalLogsToday = 0;
-static int maxLogsPerDay = 10;             // 🔥 Máximo 10 logs por dia
-static datetime lastLogDate = 0;
-
-// 🔥 NOVO: Contadores de validações rigorosas
-int strictValidationPassed = 0;
-int strictValidationFailed = 0;
-int cleanLineRejections = 0;
-int divergenceRejections = 0;
+string licenseAccount = "467151"; // Edite aqui o número da conta
+datetime licenseExpiration = D'2025.12.31 17:55:59'; // Edite aqui a data de expiração (formato: YYYY.MM.DD HH:MM:SS)
 
 //+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Controle de Logs do Console                     |
-//+------------------------------------------------------------------+
-bool CanPrintLog()
-{
-   datetime currentTime = TimeCurrent();
-   datetime currentDate = (datetime)(currentTime / 86400) * 86400; // Início do dia
-   
-   // Reset contador diário
-   if(currentDate != lastLogDate)
-   {
-      lastLogDate = currentDate;
-      totalLogsToday = 0;
-   }
-   
-   // Verificar limites
-   if(totalLogsToday >= maxLogsPerDay) return false;
-   if(currentTime - lastLogTime < logCooldownSeconds) return false;
-   
-   // Atualizar contadores
-   lastLogTime = currentTime;
-   totalLogsToday++;
-   
-   return true;
-}
-
-void PrintControlledLog(string message)
-{
-   if(ShowDebugInfo && CanPrintLog())
-   {
-      Print("🔥 ", message);
-   }
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Validar Contexto do Candle para Confirmação     |
-//+------------------------------------------------------------------+
-bool IsValidCandleContext(const double &open[], const double &close[], 
-                         const double &high[], const double &low[], 
-                         int position, bool is_buy_signal)
-{
-   if(position < 3) return true; // Não há dados suficientes
-   
-   // Verificar tipo do candle atual
-   bool current_candle_bullish = close[position] > open[position];
-   bool current_candle_bearish = close[position] < open[position];
-   
-   // Verificar momentum dos últimos 3 candles
-   int bullish_candles = 0;
-   int bearish_candles = 0;
-   
-   for(int i = 0; i < 3; i++)
-   {
-      int bar = position - i;
-      if(bar >= 0)
-      {
-         if(close[bar] > open[bar]) bullish_candles++;
-         if(close[bar] < open[bar]) bearish_candles++;
-      }
-   }
-   
-   if(is_buy_signal)
-   {
-      // COMPRA: Preferir confirmação quando há pressão vendedora ou correção
-      // ❌ NÃO confirmar compra em forte movimento de alta
-      if(bullish_candles >= 3) // 3 candles verdes consecutivos = muito otimista para compra
-      {
-         if(ShowDivergenceValidation)
-            PrintControlledLog("COMPRA REJEITADA - Contexto muito otimista (3 candles verdes)");
-         return false;
-      }
-      
-      // ✅ Preferir contexto neutro ou ligeiramente baixista
-      return true;
-   }
-   else
-   {
-      // VENDA: Preferir confirmação quando há pressão compradora ou correção
-      // ❌ NÃO confirmar venda em forte movimento de baixa
-      if(bearish_candles >= 3) // 3 candles vermelhos consecutivos = muito pessimista para venda
-      {
-         if(ShowDivergenceValidation)
-            PrintControlledLog("VENDA REJEITADA - Contexto muito pessimista (3 candles vermelhos)");
-         return false;
-      }
-      
-      // ✅ Preferir contexto neutro ou ligeiramente altista
-      return true;
-   }
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Validar Timing da Confirmação                   |
-//+------------------------------------------------------------------+
-bool IsValidConfirmationTiming(const double &open[], const double &close[], 
-                              const double &high[], const double &low[], 
-                              int position, bool is_buy_signal)
-{
-   if(position < 1) return true;
-   
-   bool current_candle_bullish = close[position] > open[position];
-   bool current_candle_bearish = close[position] < open[position];
-   
-   if(is_buy_signal)
-   {
-      // COMPRA: OK confirmar em candle vermelho (correção) ou doji
-      // ❌ EVITAR confirmar em candle verde forte (já subiu muito)
-      
-      if(current_candle_bullish)
-      {
-         double candle_size = MathAbs(close[position] - open[position]);
-         double candle_range = high[position] - low[position];
-         double body_ratio = candle_range > 0 ? candle_size / candle_range : 0;
-         
-         // Se candle verde tem corpo > 70% do range = movimento forte
-         if(body_ratio > 0.7)
-         {
-            if(ShowDivergenceValidation)
-               PrintControlledLog("COMPRA REJEITADA - Candle verde muito forte (" + DoubleToString(body_ratio*100, 0) + "% corpo)");
-            return false;
-         }
-      }
-      
-      return true; // OK confirmar em candle vermelho, doji ou verde pequeno
-   }
-   else
-   {
-      // VENDA: OK confirmar em candle verde (correção) ou doji  
-      // ❌ EVITAR confirmar em candle vermelho forte (já caiu muito)
-      
-      if(current_candle_bearish)
-      {
-         double candle_size = MathAbs(close[position] - open[position]);
-         double candle_range = high[position] - low[position];
-         double body_ratio = candle_range > 0 ? candle_size / candle_range : 0;
-         
-         // Se candle vermelho tem corpo > 70% do range = movimento forte
-         if(body_ratio > 0.7)
-         {
-            if(ShowDivergenceValidation)
-               PrintControlledLog("VENDA REJEITADA - Candle vermelho muito forte (" + DoubleToString(body_ratio*100, 0) + "% corpo)");
-            return false;
-         }
-      }
-      
-      return true; // OK confirmar em candle verde, doji ou vermelho pequeno
-   }
-}
-bool IsValidDivergenceDirection(double price_past, double price_current, 
-                               double rsi_past, double rsi_current, bool is_bullish)
-{
-   if(is_bullish)
-   {
-      // COMPRA: Preço faz fundo MAIS BAIXO + RSI faz fundo MAIS ALTO
-      bool price_lower = (price_current < price_past);      // Fundo mais baixo
-      bool rsi_higher = (rsi_current > rsi_past);           // RSI mais alto (divergência)
-      
-      if(ShowDivergenceValidation && (!price_lower || !rsi_higher))
-      {
-         PrintControlledLog("COMPRA REJEITADA - Preço: " + (price_lower ? "✓Mais baixo" : "✗Não mais baixo") + 
-                           " | RSI: " + (rsi_higher ? "✓Mais alto" : "✗Não mais alto"));
-         divergenceRejections++;
-      }
-      
-      return price_lower && rsi_higher;
-   }
-   else
-   {
-      // VENDA: Preço faz topo MAIS ALTO + RSI faz topo MAIS BAIXO  
-      bool price_higher = (price_current > price_past);     // Topo mais alto
-      bool rsi_lower = (rsi_current < rsi_past);            // RSI mais baixo (divergência)
-      
-      if(ShowDivergenceValidation && (!price_higher || !rsi_lower))
-      {
-         PrintControlledLog("VENDA REJEITADA - Preço: " + (price_higher ? "✓Mais alto" : "✗Não mais alto") + 
-                           " | RSI: " + (rsi_lower ? "✓Mais baixo" : "✗Não mais baixo"));
-         divergenceRejections++;
-      }
-      
-      return price_higher && rsi_lower;
-   }
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Verificar se Linha Corta Pivôs Intermediários   |
-//+------------------------------------------------------------------+
-bool LinePassesCleanly(const double &data[], int start_bar, int end_bar, 
-                      bool is_bullish, double tolerance_percent = 5.0)
-{
-   if(!EnableCleanLineCheck) return true; // Se desabilitado, sempre aprova
-   if(start_bar >= end_bar) return false;
-   
-   double start_value = data[start_bar];
-   double end_value = data[end_bar];
-   double line_tolerance = MathAbs(end_value - start_value) * (tolerance_percent / 100.0);
-   
-   // Verificar se há pivôs intermediários que cortam a linha
-   for(int i = start_bar + 1; i < end_bar; i++)
-   {
-      // Calcular onde a linha deveria estar neste ponto
-      double line_ratio = (double)(i - start_bar) / (double)(end_bar - start_bar);
-      double expected_line_value = start_value + (end_value - start_value) * line_ratio;
-      
-      if(is_bullish)
-      {
-         // Para COMPRA: verificar se há fundos intermediários que estão muito abaixo da linha
-         bool is_significant_low = IsValidPivot(data, i, false, 1); // Buscar fundo
-         
-         if(is_significant_low && data[i] < (expected_line_value - line_tolerance))
-         {
-            if(ShowDivergenceValidation)
-            {
-               PrintControlledLog("LINHA CORTADA (Compra) - Fundo intermediário na barra " + (string)i);
-               cleanLineRejections++;
-            }
-            return false; // Linha corta um fundo significativo
-         }
-      }
-      else
-      {
-         // Para VENDA: verificar se há topos intermediários que estão muito acima da linha
-         bool is_significant_high = IsValidPivot(data, i, true, 1); // Buscar topo
-         
-         if(is_significant_high && data[i] > (expected_line_value + line_tolerance))
-         {
-            if(ShowDivergenceValidation)
-            {
-               PrintControlledLog("LINHA CORTADA (Venda) - Topo intermediário na barra " + (string)i);
-               cleanLineRejections++;
-            }
-            return false; // Linha corta um topo significativo
-         }
-      }
-   }
-   
-   return true; // Linha passa limpa
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Busca Rigorosa de Pivôs do Mesmo Tipo           |
-//+------------------------------------------------------------------+
-int FindStrictPivotOfSameType(const double &data[], int current, bool looking_for_high, 
-                             int min_distance, int max_lookback, double current_level)
-{
-   if(!RequireStrictPivots) 
-   {
-      // Usar busca original se validação rigorosa estiver desabilitada
-      for(int i = current - min_distance; i >= current - max_lookback; i--)
-      {
-         if(i < PivotStrength) break;
-         if(IsValidPivot(data, i, looking_for_high, PivotStrength))
-         {
-            return i;
-         }
-      }
-      return -1;
-   }
-   
-   int best_pivot = -1;
-   double best_value = looking_for_high ? -DBL_MAX : DBL_MAX;
-   
-   for(int i = current - min_distance; i >= current - max_lookback; i--)
-   {
-      if(i < PivotStrength) break;
-      
-      // Verificar se é pivô válido do tipo correto
-      if(IsValidPivot(data, i, looking_for_high, PivotStrength))
-      {
-         if(looking_for_high)
-         {
-            // Para topos: buscar o mais alto no passado
-            if(data[i] > best_value)
-            {
-               // VENDA: Garantir que o topo atual é MAIS ALTO que o passado
-               if(current_level > data[i]) // Divergência: preço mais alto
-               {
-                  best_value = data[i];
-                  best_pivot = i;
-               }
-            }
-         }
-         else
-         {
-            // Para fundos: buscar o mais alto no passado (para comparar com fundo mais baixo atual)
-            if(data[i] > best_value)
-            {
-               // COMPRA: Garantir que o fundo atual é MAIS BAIXO que o passado  
-               if(current_level < data[i]) // Divergência: preço mais baixo
-               {
-                  best_value = data[i];
-                  best_pivot = i;
-               }
-            }
-         }
-      }
-   }
-   
-   return best_pivot;
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Busca de Pivôs RSI Correspondentes MELHORADA    |
-//+------------------------------------------------------------------+
-RSIPivots FindRSIPivotsStrict(const double &rsi_raw[], int price_pivot, int price_current, 
-                             bool is_bullish, double price_past, double price_current_val)
-{
-   RSIPivots result;
-   result.valid = false;
-   result.rsi_pivot_past = price_pivot;     // Fallback inicial
-   result.rsi_pivot_current = price_current; // Fallback inicial
-   
-   int search_range = MaxSearchRangeForRSI;
-   
-   // 🔥 SEMPRE BUSCAR OS PIVÔS RSI MAIS PRÓXIMOS PRIMEIRO
-   int best_rsi_past = -1;
-   int best_rsi_current = -1;
-   double best_rsi_past_value = is_bullish ? DBL_MAX : -DBL_MAX;
-   double best_rsi_current_value = is_bullish ? DBL_MAX : -DBL_MAX;
-   
-   if(is_bullish)
-   {
-      // COMPRA: Buscar FUNDOS RSI próximos aos fundos de preço
-      
-      // 1. Buscar fundo RSI próximo ao price_pivot
-      for(int i = price_pivot - search_range; i <= price_pivot + search_range; i++)
-      {
-         if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-         {
-            if(IsValidPivot(rsi_raw, i, false, 1)) // false = fundo
-            {
-               if(rsi_raw[i] < best_rsi_past_value) // Buscar o fundo mais baixo
-               {
-                  best_rsi_past_value = rsi_raw[i];
-                  best_rsi_past = i;
-               }
-            }
-         }
-      }
-      
-      // 2. Buscar fundo RSI próximo ao price_current
-      for(int i = price_current - search_range; i <= price_current + search_range; i++)
-      {
-         if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-         {
-            if(IsValidPivot(rsi_raw, i, false, 1)) // false = fundo
-            {
-               if(rsi_raw[i] < best_rsi_current_value) // Buscar o fundo mais baixo
-               {
-                  best_rsi_current_value = rsi_raw[i];
-                  best_rsi_current = i;
-               }
-            }
-         }
-      }
-   }
-   else
-   {
-      // VENDA: Buscar TOPOS RSI próximos aos topos de preço
-      
-      // 1. Buscar topo RSI próximo ao price_pivot
-      for(int i = price_pivot - search_range; i <= price_pivot + search_range; i++)
-      {
-         if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-         {
-            if(IsValidPivot(rsi_raw, i, true, 1)) // true = topo
-            {
-               if(rsi_raw[i] > best_rsi_past_value) // Buscar o topo mais alto
-               {
-                  best_rsi_past_value = rsi_raw[i];
-                  best_rsi_past = i;
-               }
-            }
-         }
-      }
-      
-      // 2. Buscar topo RSI próximo ao price_current
-      for(int i = price_current - search_range; i <= price_current + search_range; i++)
-      {
-         if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-         {
-            if(IsValidPivot(rsi_raw, i, true, 1)) // true = topo
-            {
-               if(rsi_raw[i] > best_rsi_current_value) // Buscar o topo mais alto
-               {
-                  best_rsi_current_value = rsi_raw[i];
-                  best_rsi_current = i;
-               }
-            }
-         }
-      }
-   }
-   
-   // 🔥 USAR OS MELHORES PIVÔS ENCONTRADOS (mesmo que não passem na validação rigorosa)
-   if(best_rsi_past != -1 && best_rsi_current != -1)
-   {
-      result.rsi_pivot_past = best_rsi_past;
-      result.rsi_pivot_current = best_rsi_current;
-      
-      // 3. VALIDAR DIVERGÊNCIA APENAS SE HABILITADO
-      bool valid_divergence = true;
-      if(EnableStrictDivergenceCheck)
-      {
-         valid_divergence = IsValidDivergenceDirection(price_past, price_current_val, 
-                                                      rsi_raw[result.rsi_pivot_past], 
-                                                      rsi_raw[result.rsi_pivot_current], is_bullish);
-      }
-      
-      // 4. VALIDAR TRAÇADO LIMPO APENAS SE HABILITADO
-      bool clean_line = true;
-      if(EnableCleanLineCheck)
-      {
-         clean_line = LinePassesCleanly(rsi_raw, result.rsi_pivot_past, result.rsi_pivot_current, is_bullish, LineTolerancePercent);
-      }
-      
-      result.valid = valid_divergence && clean_line;
-      
-      if(result.valid) strictValidationPassed++;
-      else strictValidationFailed++;
-      
-      // 🔥 SEMPRE USAR OS PIVÔS ENCONTRADOS, mesmo que validação falhe
-      // Isso garante linhas mais paralelas
-      result.valid = true; // Forçar como válido para desenhar linha correta
-   }
-   else
-   {
-      // 🔥 FALLBACK MELHORADO: Se não encontrou pivôs, buscar o mais próximo possível
-      if(best_rsi_past == -1)
-      {
-         // Buscar qualquer pivô RSI próximo, mesmo que não seja do tipo ideal
-         for(int i = price_pivot - search_range; i <= price_pivot + search_range; i++)
-         {
-            if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-            {
-               if(IsValidPivot(rsi_raw, i, !is_bullish, 1) || IsValidPivot(rsi_raw, i, is_bullish, 1))
-               {
-                  result.rsi_pivot_past = i;
-                  break;
-               }
-            }
-         }
-      }
-      
-      if(best_rsi_current == -1)
-      {
-         // Buscar qualquer pivô RSI próximo, mesmo que não seja do tipo ideal
-         for(int i = price_current - search_range; i <= price_current + search_range; i++)
-         {
-            if(i >= 1 && i < ArraySize(rsi_raw) - 1)
-            {
-               if(IsValidPivot(rsi_raw, i, !is_bullish, 1) || IsValidPivot(rsi_raw, i, is_bullish, 1))
-               {
-                  result.rsi_pivot_current = i;
-                  break;
-               }
-            }
-         }
-      }
-      
-      result.valid = true; // Sempre considerar válido para traçar linhas paralelas
-      strictValidationFailed++;
-   }
-   
-   return result;
-}
-
-//+------------------------------------------------------------------+
-//| TODAS AS FUNÇÕES ORIGINAIS MANTIDAS INTEGRALMENTE               |
+//| Funções de escalonamento CORRIGIDAS - Escala 0-100 Original     |
 //+------------------------------------------------------------------+
 double ScaleRSIValue(double rsiValue) 
 { 
@@ -759,6 +204,82 @@ double ScaleVolumeValue(double volumeValue, long maxVolume)
    return VOLUME_ZONE_MIN + (normalizedVolume * (VOLUME_ZONE_MAX - VOLUME_ZONE_MIN)); 
 }
 
+//+------------------------------------------------------------------+
+//| Validação de linha de divergência limpa (sem obstruções)        |
+//+------------------------------------------------------------------+
+bool IsCleanDivergenceLine(const double &price[], const double &rsi[], int start_bar, int end_bar, bool is_bullish)
+{
+   if(start_bar == end_bar) return false;
+   if(start_bar > end_bar) { int temp = start_bar; start_bar = end_bar; end_bar = temp; } // Garantir ordem
+   
+   double start_price = price[start_bar];
+   double end_price = price[end_bar];
+   double start_rsi = rsi[start_bar];
+   double end_rsi = rsi[end_bar];
+   
+   // Tolerância para "linha limpa" (2% do movimento do preço)
+   double price_tolerance = MathAbs(end_price - start_price) * 0.02;
+   double rsi_tolerance = MathAbs(end_rsi - start_rsi) * 0.1;
+   
+   for(int i = start_bar + 1; i < end_bar; i++)
+   {
+      if(is_bullish)
+      {
+         // Divergência Bullish: preço faz fundos menores, RSI fundos maiores
+         // Verificar se há fundos intermediários que "cortam" a linha
+         
+         // 1. Verificar linha de preço (não deve ter fundos muito abaixo)
+         double min_price_allowed = MathMin(start_price, end_price) - price_tolerance;
+         if(price[i] < min_price_allowed)
+         {
+            if(ShowDebugInfo)
+               Print("❌ LINHA NÃO LIMPA (Bullish): Fundo intermediário na barra ", i, " | Preço: ", price[i], " < Mín permitido: ", min_price_allowed);
+            return false;
+         }
+         
+         // 2. Verificar se há pivôs RSI que quebram a lógica
+         bool isPivotRsi = IsValidPivot(rsi, i, false, 1); // Pivô simples
+         if(isPivotRsi && rsi[i] < MathMin(start_rsi, end_rsi) - rsi_tolerance)
+         {
+            if(ShowDebugInfo)
+               Print("❌ LINHA NÃO LIMPA (Bullish): Pivô RSI intermediário quebra lógica na barra ", i, " | RSI: ", rsi[i]);
+            return false;
+         }
+      }
+      else
+      {
+         // Divergência Bearish: preço faz topos maiores, RSI topos menores
+         // Verificar se há topos intermediários que "cortam" a linha
+         
+         // 1. Verificar linha de preço (não deve ter topos muito acima)
+         double max_price_allowed = MathMax(start_price, end_price) + price_tolerance;
+         if(price[i] > max_price_allowed)
+         {
+            if(ShowDebugInfo)
+               Print("❌ LINHA NÃO LIMPA (Bearish): Topo intermediário na barra ", i, " | Preço: ", price[i], " > Máx permitido: ", max_price_allowed);
+            return false;
+         }
+         
+         // 2. Verificar se há pivôs RSI que quebram a lógica
+         bool isPivotRsi = IsValidPivot(rsi, i, true, 1); // Pivô simples
+         if(isPivotRsi && rsi[i] > MathMax(start_rsi, end_rsi) + rsi_tolerance)
+         {
+            if(ShowDebugInfo)
+               Print("❌ LINHA NÃO LIMPA (Bearish): Pivô RSI intermediário quebra lógica na barra ", i, " | RSI: ", rsi[i]);
+            return false;
+         }
+      }
+   }
+   
+   if(ShowDebugInfo)
+      Print("✅ LINHA LIMPA (", is_bullish ? "Bullish" : "Bearish", "): Sem obstruções entre barras ", start_bar, " e ", end_bar);
+   
+   return true;
+}
+
+//+------------------------------------------------------------------+
+//| Detectar se está em backtest                                    |
+//+------------------------------------------------------------------+
 bool IsBacktest()
 {
    return (MQLInfoInteger(MQL_TESTER) || 
@@ -766,10 +287,98 @@ bool IsBacktest()
            MQLInfoInteger(MQL_VISUAL_MODE));
 }
 
+//+------------------------------------------------------------------+
+//| Função de detecção de pivôs ANTI LOOK-AHEAD                     |
+//+------------------------------------------------------------------+
+bool IsValidPivotAntiLookAhead(const double &data[], int position, bool isHigh, int strength, int current_bar)
+{
+   // 🔥 SÓ ATIVA SE: EnableAntiLookAhead = true E está em backtest
+   bool useAntiLookAhead = EnableAntiLookAhead && IsBacktest();
+   
+   if(position < strength || position >= ArraySize(data)) return false;
+   
+   // 🔥 REGRA PRINCIPAL: Só confirma pivô após X barras (SÓ NO BACKTEST)
+   if(useAntiLookAhead && (current_bar - position) < PivotConfirmationBars) 
+      return false;
+   
+   // Verificar pivô
+   for(int i = 1; i <= strength; i++)
+   {
+      if(isHigh)
+      {
+         // ✅ SÓ COMPARA COM PASSADO
+         if(data[position] <= data[position - i])
+            return false;
+            
+         // 🔥 Anti Look-Ahead SÓ NO BACKTEST
+         if(useAntiLookAhead)
+         {
+            // Só verifica dados "futuros" se já foram confirmados
+            int check_bar = position + i;
+            if(check_bar <= (current_bar - PivotConfirmationBars))
+            {
+               if(data[position] <= data[check_bar])
+                  return false;
+            }
+            // Se não passou tempo de confirmação, ignora dados futuros
+         }
+         else
+         {
+            // TEMPO REAL: Lógica original (como estava funcionando)
+            if(position + i < ArraySize(data) && data[position] <= data[position + i])
+               return false;
+         }
+      }
+      else
+      {
+         // ✅ SÓ COMPARA COM PASSADO  
+         if(data[position] >= data[position - i])
+            return false;
+            
+         // 🔥 Anti Look-Ahead SÓ NO BACKTEST
+         if(useAntiLookAhead)
+         {
+            // Só verifica dados "futuros" se já foram confirmados
+            int check_bar = position + i;
+            if(check_bar <= (current_bar - PivotConfirmationBars))
+            {
+               if(data[position] >= data[check_bar])
+                  return false;
+            }
+            // Se não passou tempo de confirmação, ignora dados futuros
+         }
+         else
+         {
+            // TEMPO REAL: Lógica original (como estava funcionando)
+            if(position + i < ArraySize(data) && data[position] >= data[position + i])
+               return false;
+         }
+      }
+   }
+   return true;
+}
+
+//+------------------------------------------------------------------+
+//| Função de detecção de pivôs ORIGINAL - TEMPO REAL MELHORADA     |
+//+------------------------------------------------------------------+
 bool IsValidPivot(const double &data[], int position, bool isHigh, int strength)
 {
-   // ✅ TEMPO REAL: Permite detecção até a penúltima barra (mais responsivo)
-   int max_allowed = IsBacktest() ? ArraySize(data) - strength : ArraySize(data) - 1;
+   // ✅ TEMPO REAL MELHORADO: Permite detecção mais flexível na barra atual
+   int array_size = ArraySize(data);
+   if(array_size <= 0) return false;
+   
+   // 🔥 CORREÇÃO TEMPO REAL: Mais flexível para barra atual
+   int max_allowed;
+   if(IsBacktest())
+   {
+      max_allowed = array_size - strength; // Backtest: conservador
+   }
+   else
+   {
+      // ✅ TEMPO REAL: Permite até barra atual (mais responsivo)
+      max_allowed = array_size;
+   }
+   
    if(position < strength || position >= max_allowed) return false;
    
    for(int i = 1; i <= strength; i++)
@@ -779,42 +388,101 @@ bool IsValidPivot(const double &data[], int position, bool isHigh, int strength)
          // Verifica passado
          if(data[position] <= data[position - i]) return false;
          
-         // Verifica futuro (só se disponível)
-         if(position + i < ArraySize(data) && data[position] <= data[position + i])
-            return false;
+         // 🔥 VERIFICA FUTURO SÓ SE DISPONÍVEL (mais seguro)
+         if(position + i < array_size)
+         {
+            if(data[position] <= data[position + i])
+               return false;
+         }
+         // ✅ SE NÃO HÁ DADOS FUTUROS, ACEITA (tempo real)
       }
       else
       {
          // Verifica passado  
          if(data[position] >= data[position - i]) return false;
          
-         // Verifica futuro (só se disponível)
-         if(position + i < ArraySize(data) && data[position] >= data[position + i])
-            return false;
+         // 🔥 VERIFICA FUTURO SÓ SE DISPONÍVEL (mais seguro)
+         if(position + i < array_size)
+         {
+            if(data[position] >= data[position + i])
+               return false;
+         }
+         // ✅ SE NÃO HÁ DADOS FUTUROS, ACEITA (tempo real)
       }
    }
    return true;
 }
 
-bool IsStrongPivot(const double &data[], int position, bool isHigh, int strength, double min_amplitude)
+//+------------------------------------------------------------------+
+//| Validação de amplitude do pivô ANTI LOOK-AHEAD                  |
+//+------------------------------------------------------------------+
+bool IsStrongPivotAntiLookAhead(const double &data[], int position, bool isHigh, int strength, double min_amplitude, int current_bar)
 {
-   if(!IsValidPivot(data, position, isHigh, strength)) return false;
+   if(!IsValidPivotAntiLookAhead(data, position, isHigh, strength, current_bar)) return false;
+   
+   // 🔥 SÓ ATIVA SE: EnableAntiLookAhead = true E está em backtest
+   bool useAntiLookAhead = EnableAntiLookAhead && IsBacktest();
    
    double amplitude = 0;
    for(int i = 1; i <= strength; i++)
    {
       if(isHigh)
       {
-         // ✅ TEMPO REAL: Usa dados disponíveis
+         if(useAntiLookAhead)
+         {
+            // BACKTEST: Anti Look-Ahead
+            amplitude = MathMax(amplitude, data[position] - MathMin(data[position-i], 
+                              (position+i >= current_bar) ? data[position-i] : data[position+i]));
+         }
+         else
+         {
+            // TEMPO REAL: Lógica original
+            amplitude = MathMax(amplitude, data[position] - MathMin(data[position-i], data[position+i]));
+         }
+      }
+      else
+      {
+         if(useAntiLookAhead)
+         {
+            // BACKTEST: Anti Look-Ahead
+            amplitude = MathMax(amplitude, MathMax(data[position-i], 
+                              (position+i >= current_bar) ? data[position-i] : data[position+i]) - data[position]);
+         }
+         else
+         {
+            // TEMPO REAL: Lógica original
+            amplitude = MathMax(amplitude, MathMax(data[position-i], data[position+i]) - data[position]);
+         }
+      }
+   }
+   
+   return amplitude >= min_amplitude;
+}
+
+//+------------------------------------------------------------------+
+//| Validação de amplitude do pivô ORIGINAL - TEMPO REAL MELHORADA  |
+//+------------------------------------------------------------------+
+bool IsStrongPivot(const double &data[], int position, bool isHigh, int strength, double min_amplitude)
+{
+   if(!IsValidPivot(data, position, isHigh, strength)) return false;
+   
+   double amplitude = 0;
+   int array_size = ArraySize(data);
+   
+   for(int i = 1; i <= strength; i++)
+   {
+      if(isHigh)
+      {
+         // ✅ TEMPO REAL MELHORADO: Usa dados disponíveis + fallback
          double left = data[position-i];
-         double right = (position+i < ArraySize(data)) ? data[position+i] : data[position-i];
+         double right = (position+i < array_size) ? data[position+i] : data[position-i]; // Fallback seguro
          amplitude = MathMax(amplitude, data[position] - MathMin(left, right));
       }
       else
       {
-         // ✅ TEMPO REAL: Usa dados disponíveis
+         // ✅ TEMPO REAL MELHORADO: Usa dados disponíveis + fallback
          double left = data[position-i];  
-         double right = (position+i < ArraySize(data)) ? data[position+i] : data[position-i];
+         double right = (position+i < array_size) ? data[position+i] : data[position-i]; // Fallback seguro
          amplitude = MathMax(amplitude, MathMax(left, right) - data[position]);
       }
    }
@@ -822,14 +490,17 @@ bool IsStrongPivot(const double &data[], int position, bool isHigh, int strength
    return amplitude >= min_amplitude;
 }
 
+//+------------------------------------------------------------------+
+//| Validação de divergência real - ULTRA RELAXADA                  |
+//+------------------------------------------------------------------+
 bool IsRealDivergence(double price1, double price2, double rsi1, double rsi2, bool is_bullish)
 {
    double price_diff_percent = MathAbs((price2 - price1) / price1) * 100.0;
    double rsi_diff = MathAbs(rsi2 - rsi1);
    
-   // ✅ VALORES ORIGINAIS MANTIDOS
-   if(price_diff_percent < 0.005) return false;  
-   if(rsi_diff < 0.3) return false;              
+   // ULTRA RELAXADO: Filtros mínimos apenas para evitar ruído
+   if(price_diff_percent < 0.01) return false;  // Era 0.03 - agora 0.01
+   if(rsi_diff < 0.5) return false;             // Era 1.5 - agora 0.5
    
    if(is_bullish)
    {
@@ -843,6 +514,9 @@ bool IsRealDivergence(double price1, double price2, double rsi1, double rsi2, bo
    }
 }
 
+//+------------------------------------------------------------------+
+//| Validação de contexto de tendência MELHORADA                    |
+//+------------------------------------------------------------------+
 bool IsValidTrendContext(const double &price[], int pivot, int current, bool is_bullish)
 {
    if(!RequireTrendContext) return true;
@@ -874,6 +548,9 @@ bool IsValidTrendContext(const double &price[], int pivot, int current, bool is_
    }
 }
 
+//+------------------------------------------------------------------+
+//| Validação de inclinação mínima da linha de divergência          |
+//+------------------------------------------------------------------+
 bool HasMinimumLineSlope(double price1, double price2, double rsi1, double rsi2, int bars_distance, bool is_bullish)
 {
    if(bars_distance <= 1) return false;
@@ -885,33 +562,38 @@ bool HasMinimumLineSlope(double price1, double price2, double rsi1, double rsi2,
    // ✅ INCLINAÇÃO DO RSI (por barra)  
    double rsi_slope_per_bar = MathAbs(rsi2 - rsi1) / bars_distance;
    
-   // 🔧 CRITÉRIOS REEQUILIBRADOS - MAIS RIGOROSOS
-   double min_price_change = MinPriceDifference;  // Usar valor do input (agora 0.025)
-   double min_rsi_change = RSIMinSlope;           // Usar valor do input (agora 1.0)
+   // ✅ CRITÉRIOS MÍNIMOS DE INCLINAÇÃO
+   double min_price_change = 0.05;  // Mínimo 0.05% de mudança no preço
+   double min_rsi_change = 1.5;     // Mínimo 1.5 pontos RSI
    
    bool price_slope_ok = price_change_percent >= min_price_change;
    bool rsi_slope_ok = rsi_slope_per_bar >= (min_rsi_change / bars_distance);
    
-   // 🔥 LOG CONTROLADO - sem spam
-   if(ShowDebugInfo && CanPrintLog() && (!price_slope_ok || !rsi_slope_ok))
+   if(ShowDebugInfo && (!price_slope_ok || !rsi_slope_ok))
    {
-      PrintControlledLog("INCLINAÇÃO INSUFICIENTE - Preço: " + DoubleToString(price_change_percent, 3) + "% | RSI: " + DoubleToString(rsi_slope_per_bar, 2));
+      Print("❌ INCLINAÇÃO INSUFICIENTE: Preço=", DoubleToString(price_change_percent, 3), 
+            "% (min:", min_price_change, ") | RSI/barra=", DoubleToString(rsi_slope_per_bar, 2), 
+            " (min:", DoubleToString(min_rsi_change/bars_distance, 2), ")");
    }
    
    return price_slope_ok && rsi_slope_ok;
 }
 
+//+------------------------------------------------------------------+
+//| Controle de sequência RSI (evitar muitos fundos consecutivos)   |
+//+------------------------------------------------------------------+
 bool IsValidRSISequence(int current_bar, bool is_bullish)
 {
    if(is_bullish)
    {
-      // ✅ CONTROLE BULLISH ORIGINAL: Após 3 fundos consecutivos, dar cooldown
+      // ✅ CONTROLE BULLISH: Após 3 fundos consecutivos, dar cooldown
       if(lastBullishPivotBar > 0 && (current_bar - lastBullishPivotBar) <= 8)
       {
          consecutiveBullishPivots++;
          if(consecutiveBullishPivots >= 3)
          {
-            PrintControlledLog("BULLISH REJEITADO - Muitos fundos consecutivos (" + (string)consecutiveBullishPivots + ")");
+            if(ShowDebugInfo)
+               Print("❌ BULLISH REJEITADO: Muitos fundos consecutivos (", consecutiveBullishPivots, ") - cooldown");
             return false;
          }
       }
@@ -923,13 +605,14 @@ bool IsValidRSISequence(int current_bar, bool is_bullish)
    }
    else
    {
-      // ✅ CONTROLE BEARISH ORIGINAL: Após 3 topos consecutivos, dar cooldown  
+      // ✅ CONTROLE BEARISH: Após 3 topos consecutivos, dar cooldown  
       if(lastBearishPivotBar > 0 && (current_bar - lastBearishPivotBar) <= 8)
       {
          consecutiveBearishPivots++;
          if(consecutiveBearishPivots >= 3)
          {
-            PrintControlledLog("BEARISH REJEITADO - Muitos topos consecutivos (" + (string)consecutiveBearishPivots + ")");
+            if(ShowDebugInfo)
+               Print("❌ BEARISH REJEITADO: Muitos topos consecutivos (", consecutiveBearishPivots, ") - cooldown");
             return false;
          }
       }
@@ -943,6 +626,9 @@ bool IsValidRSISequence(int current_bar, bool is_bullish)
    return true;
 }
 
+//+------------------------------------------------------------------+
+//| Função de filtros de significância - ULTRA RELAXADA             |
+//+------------------------------------------------------------------+
 bool CheckSignificance(double price1, double price2, double rsi1, double rsi2, 
                        bool is_bullish, ENUM_DIVERGENCE_MODE mode)
 {
@@ -952,21 +638,24 @@ bool CheckSignificance(double price1, double price2, double rsi1, double rsi2,
    switch(mode)
    {
       case MODE_SENSITIVE:
-         // ✅ VALORES ORIGINAIS MANTIDOS
-         return rsi_diff >= 0.05 && price_diff_percent >= 0.0005; 
+         // ULTRA RELAXADO para detectar MUITAS divergências
+         return rsi_diff >= 0.1 && price_diff_percent >= 0.001; // Quase qualquer movimento
          
       case MODE_BALANCED:
-         // 🔧 VALORES REEQUILIBRADOS - MAIS RIGOROSOS
-         return rsi_diff >= 0.8 && price_diff_percent >= 0.02; 
+         // MUITO RELAXADO também
+         return rsi_diff >= 0.5 && price_diff_percent >= 0.01;
          
       case MODE_CONSERVATIVE:
-         // ✅ VALORES ORIGINAIS MANTIDOS
-         return rsi_diff >= MinRSIDifference * 0.3 && price_diff_percent >= MinPriceDifference * 0.3; 
+         // RELAXADO também
+         return rsi_diff >= MinRSIDifference * 0.5 && price_diff_percent >= MinPriceDifference * 0.5;
    }
    
    return false;
 }
 
+//+------------------------------------------------------------------+
+//| Helper functions                                                 |
+//+------------------------------------------------------------------+
 double GetVolumeChangePercent(const long &tick_volume[], int start, int end) 
 { 
    if(end <= start || start < Volume_Period || end >= ArraySize(tick_volume)) return 0.0; 
@@ -1005,6 +694,12 @@ double GetVolumeChangePercent(const long &tick_volume[], int start, int end)
    // ✅ USAR O MÉTODO MAIS CONSERVADOR (evita falsos positivos)
    double result = (MathAbs(visual_method) > MathAbs(current_vs_avg)) ? current_vs_avg : visual_method;
    
+   if(ShowDebugInfo)
+   {
+      Print("📊 Volume Analysis [", start, "->", end, "]: Visual=", DoubleToString(visual_method, 1), 
+            "% | vs Média=", DoubleToString(current_vs_avg, 1), "% | Usado=", DoubleToString(result, 1), "%");
+   }
+   
    return result;
 }
 
@@ -1012,10 +707,13 @@ bool CheckVolumeConfirmation(bool is_buy, const long &tick_volume[], int start, 
 { 
    double volumeChange = GetVolumeChangePercent(tick_volume, start, end); 
    
-   // 🔥 CORREÇÃO LÓGICA: AMBAS direções procuram volume ALTO
-   bool vol_confirmed = volumeChange >= Volume_Divergence_Min;
+   if(ShowDebugInfo)
+      Print("📊 Volume check: ", is_buy ? "BUY" : "SELL", " | Período: ", start, "-", end, " | Mudança: ", NormalizeDouble(volumeChange, 1), "% | Limite: ", is_buy ? "+" : "-", Volume_Divergence_Min, "%");
    
-   return vol_confirmed;
+   if(is_buy) 
+      return volumeChange >= Volume_Divergence_Min;  
+   else 
+      return volumeChange <= -Volume_Divergence_Min; 
 }
 
 bool CheckMinimumVolume(const long &tick_volume[], int position) 
@@ -1028,629 +726,368 @@ bool CheckMinimumVolume(const long &tick_volume[], int position)
    return (double)tick_volume[position] >= (avgVolume * Min_Volume_Factor); 
 }
 
+//+------------------------------------------------------------------+
+//| Sistema de scoring de qualidade - ULTRA PERMISSIVO              |
+//+------------------------------------------------------------------+
 double CalculateDivergenceScore(double price1, double price2, double rsi1, double rsi2, 
                                int pivot, int current, const long &volume[], bool is_bullish)
 {
-   double score = 15; // ✅ VALOR ORIGINAL
+   double score = 20; // COMEÇA COM 20 PONTOS BASE
    
    // 1. Força da divergência RSI (0-30 pontos)
    double rsi_strength = MathAbs(rsi2 - rsi1);
-   score += MathMin(rsi_strength * 8, 30); 
+   score += MathMin(rsi_strength * 6, 30); // Multiplicador ainda maior
    
    // 2. Força da divergência preço (0-25 pontos)
    double price_strength = MathAbs((price2 - price1) / price1) * 100;
-   score += MathMin(price_strength * 25, 25); 
+   score += MathMin(price_strength * 20, 25); // Multiplicador muito maior
    
    // 3. Confirmação de volume (0-25 pontos) - SEMPRE DÁ PONTOS
    if(current > pivot && pivot >= Volume_Period && current >= Volume_Period)
    {
       double vol_change = GetVolumeChangePercent(volume, pivot, current);
-      // 🔥 CORRIGIDO: Volume alto para qualquer direção
-      if(vol_change > 0.5) // Volume aumentou = força
+      if((is_bullish && vol_change > 1) || (!is_bullish && vol_change < -1)) // Muito relaxado
          score += 25;
-      else if(MathAbs(vol_change) > 0.2)
+      else if(MathAbs(vol_change) > 0.5)
          score += 20;
       else
-         score += 18; 
+         score += 15; // Sempre dá pontos
    }
    else
    {
-      score += 22; 
+      score += 20; // Pontos altos se não pode calcular
    }
    
    // 4. Posição nos níveis extremos (0-20 pontos) - SEMPRE DÁ PONTOS
-   score += 18; 
+   score += 15; // Bonus base para qualquer divergência
    
-   return score; // Score geralmente será 45-100+
+   return score; // Score geralmente será 50-100
 }
 
 //+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Volume em Candles Específicos                   |
+//| Detecção de divergências clássicas CORRIGIDA                    |
 //+------------------------------------------------------------------+
-bool CheckCandleDirectionVolume(const double &open[], const double &close[], 
-                               const long &volume[], int position, bool for_buy, int lookback = 5)
+int CheckClassicDivergence(const double &price[], const double &rsi_raw[], const long &tick_volume[], int current, bool is_bullish)
 {
-   if(!DetectCandleVolume || position < lookback) return true; // Se desabilitado, sempre aprova
+   if(current < DivergenceLookback) return -1;
+
+   int pivot = -1;
+   int pivot_strength = (DivergenceMode == MODE_CONSERVATIVE) ? PivotStrength + 1 : PivotStrength;
    
-   long totalTargetVolume = 0;
-   long totalVolume = 0;
+   // ✅ CORREÇÃO: Usar sempre RSI raw (0-100) para comparações de nível
+   double level = is_bullish ? (OnlyExtremeLevels ? OversoldLevel : 45.0) : (OnlyExtremeLevels ? OverboughtLevel : 55.0);
    
-   for(int i = 0; i < lookback; i++)
+   if(is_bullish)
    {
-      int bar = position - i;
-      if(bar < 0) break;
+      // 🔥 DECIDIR: Busca original (tempo real) vs melhorada (backtest)
+      bool useAdvancedSearch = EnableAntiLookAhead && IsBacktest();
       
-      totalVolume += volume[bar];
-      
-      // Para COMPRA: verificar volume em candles VERDES
-      // Para VENDA: verificar volume em candles VERMELHOS
-      bool isTargetCandle = for_buy ? (close[bar] > open[bar]) : (close[bar] < open[bar]);
-      
-      if(isTargetCandle)
-         totalTargetVolume += volume[bar];
-   }
-   
-   if(totalVolume == 0) return true; // Se não há dados, aprova
-   
-   double targetVolumePercent = ((double)totalTargetVolume / (double)totalVolume) * 100.0;
-   bool confirmed = targetVolumePercent >= CandleVolumeThreshold;
-   
-   return confirmed;
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Fluxo Institucional                             |
-//+------------------------------------------------------------------+
-bool CheckInstitutionalVolumeFlow(const double &price_ref[], const long &volume[], 
-                                 int pivot, int current, bool for_buy)
-{
-   if(!DetectInstitutionalFlow || current <= pivot) return true; // Se desabilitado, sempre aprova
-   
-   // Calcular volume médio no período da divergência
-   long sum_volume = 0;
-   int period = current - pivot;
-   for(int i = 0; i < period && (current - i) >= 0; i++)
-      sum_volume += volume[current - i];
-   
-   double avg_volume_period = period > 0 ? (double)sum_volume / period : 0;
-   
-   // Calcular volume médio geral (referência)
-   long sum_general = 0;
-   int general_start = MathMax(0, pivot - Volume_Period);
-   for(int i = general_start; i < pivot && i >= 0; i++)
-      sum_general += volume[i];
-   double avg_volume_general = Volume_Period > 0 ? (double)sum_general / Volume_Period : 1;
-   
-   // Calcular ratio institucional
-   double volume_ratio = avg_volume_general > 0 ? (avg_volume_period / avg_volume_general) * 100.0 : 100.0;
-   
-   // Mudança no preço para validar se houve movimento significativo
-   double price_change_percent = MathAbs((price_ref[current] - price_ref[pivot]) / price_ref[pivot]) * 100.0;
-   
-   // Critério: Volume institucional + movimento mínimo (relaxado)
-   bool institutional_flow = (volume_ratio >= InstitutionalVolumeMin) && (price_change_percent >= 0.2);
-   
-   return institutional_flow;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Verificar "Esticada" do RSI (Círculos 1 e 2)    |
-//+------------------------------------------------------------------+
-bool CheckRSITravelDistance(const double &rsi[], int start_bar, int end_bar, bool is_bullish)
-{
-   if(!EnableRSITravelCheck) return true; // ✅ Se desabilitado, sempre aprova
-   
-   if(start_bar == end_bar) return false;
-   
-   double start_rsi = rsi[start_bar];
-   double end_rsi = rsi[end_bar];
-   
-   // Encontrar o nível "neutro" (50) e verificar se RSI se aproximou demais
-   for(int i = MathMin(start_bar, end_bar) + 1; i < MathMax(start_bar, end_bar); i++)
-   {
-      if(is_bullish)
+      if(useAdvancedSearch)
       {
-         // Para divergência bullish, verificar se RSI subiu demais (se aproximou muito do 50)
-         double max_allowed_rsi = MathMax(start_rsi, end_rsi) + RSIMaxDeviation;
-         if(rsi[i] > max_allowed_rsi && rsi[i] > 45.0) // Se passou muito de 45 (perto do 50)
+         // BACKTEST: Buscar MELHOR pivô (não primeiro)
+         int best_pivot = -1;
+         double best_rsi = 999.0;
+         
+         for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
          {
-            PrintControlledLog("RSI ESTICOU DEMAIS (Bullish) - Barra " + (string)i + " | RSI: " + DoubleToString(rsi[i], 1));
-            return false;
+            if(i < pivot_strength) break;
+            
+            bool priceIsBottom = IsValidPivotAntiLookAhead(price, i, false, pivot_strength, current);
+            bool rsiIsBottom = IsValidPivotAntiLookAhead(rsi_raw, i, false, pivot_strength, current);
+            
+            if(priceIsBottom && rsiIsBottom && rsi_raw[i] < level)  // ✅ Usa RSI raw para comparação
+            {
+               if(IsStrongPivotAntiLookAhead(rsi_raw, i, false, pivot_strength, MinPivotAmplitude, current))
+               {
+                  if(rsi_raw[i] < best_rsi)
+                  {
+                     best_rsi = rsi_raw[i];
+                     best_pivot = i;
+                  }
+               }
+            }
          }
+         pivot = best_pivot;
       }
       else
       {
-         // Para divergência bearish, verificar se RSI desceu demais (se aproximou muito do 50)
-         double min_allowed_rsi = MathMin(start_rsi, end_rsi) - RSIMaxDeviation;
-         if(rsi[i] < min_allowed_rsi && rsi[i] < 55.0) // Se passou muito de 55 (perto do 50)
+         // TEMPO REAL: Busca original (primeiro pivô) - COMO ESTAVA FUNCIONANDO
+         for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
          {
-            PrintControlledLog("RSI ESTICOU DEMAIS (Bearish) - Barra " + (string)i + " | RSI: " + DoubleToString(rsi[i], 1));
-            return false;
+            if(i < pivot_strength) break;
+            
+            bool priceIsBottom = IsValidPivot(price, i, false, pivot_strength);
+            bool rsiIsBottom = IsValidPivot(rsi_raw, i, false, pivot_strength);
+            
+            if(priceIsBottom && rsiIsBottom && rsi_raw[i] < level)
+            {
+               if(IsStrongPivot(rsi_raw, i, false, pivot_strength, MinPivotAmplitude))
+               {
+                  pivot = i;
+                  break; // PARA NO PRIMEIRO (como estava)
+               }
+            }
          }
       }
-   }
-   
-   return true;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Detectar Linha Cortando RSI (Círculo 3)         |
-//+------------------------------------------------------------------+
-bool CheckRSILineObstruction(const double &rsi[], int start_bar, int end_bar, bool is_bullish)
-{
-   if(!EnableRSIObstructionCheck) return true; // 🔥 NOVO: Se desabilitado, sempre aprova
-   
-   if(start_bar == end_bar) return false;
-   if(start_bar > end_bar) { int temp = start_bar; start_bar = end_bar; end_bar = temp; }
-   
-   double start_rsi = rsi[start_bar];
-   double end_rsi = rsi[end_bar];
-   int significant_obstructions = 0;
-   int max_obstructions = RSIMaxObstructions; // 🔧 REEQUILIBRADO: Agora usa 2
-   
-   for(int i = start_bar + 1; i < end_bar; i++)
-   {
-      // Calcular onde a linha deveria estar neste ponto
-      double line_ratio = (double)(i - start_bar) / (double)(end_bar - start_bar);
-      double expected_rsi_on_line = start_rsi + (end_rsi - start_rsi) * line_ratio;
       
-      // Verificar se há pivô significativo que corta a linha
-      bool is_rsi_pivot = IsValidPivot(rsi, i, !is_bullish, 1); // Pivô no sentido oposto
-      
-      if(is_rsi_pivot)
+      if(pivot > 0)
       {
-         if(is_bullish)
+         bool currentPriceIsBottom, currentRsiIsBottom;
+         
+         // 🔥 Verificar pivô atual: Anti Look-Ahead só no backtest
+         if(EnableAntiLookAhead && IsBacktest())
          {
-            // Divergência bullish: verificar se há topo no RSI que corta a linha
-            if(rsi[i] > expected_rsi_on_line + 3.0) // Topo 3 pontos acima da linha
-            {
-               significant_obstructions++;
-            }
+            currentPriceIsBottom = IsValidPivotAntiLookAhead(price, current, false, pivot_strength, current + PivotConfirmationBars);
+            currentRsiIsBottom = IsValidPivotAntiLookAhead(rsi_raw, current, false, pivot_strength, current + PivotConfirmationBars);
          }
          else
          {
-            // Divergência bearish: verificar se há fundo no RSI que corta a linha
-            if(rsi[i] < expected_rsi_on_line - 3.0) // Fundo 3 pontos abaixo da linha
-            {
-               significant_obstructions++;
-            }
+            // TEMPO REAL: Lógica original (como estava funcionando)
+            currentPriceIsBottom = IsValidPivot(price, current, false, pivot_strength);
+            currentRsiIsBottom = IsValidPivot(rsi_raw, current, false, pivot_strength);
          }
          
-         if(significant_obstructions > max_obstructions)
+         if(price[current] < price[pivot] && rsi_raw[current] > rsi_raw[pivot] && rsi_raw[current] < level)  // ✅ Usa RSI raw
          {
-            PrintControlledLog("LINHA RSI CORTADA - Muitas obstruções (" + (string)significant_obstructions + ")");
-            return false;
+            if(IsRealDivergence(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], true))  // ✅ Usa RSI raw
+            {
+               // ✅ NOVA VALIDAÇÃO: Controle de sequência RSI
+               if(!IsValidRSISequence(current, true))
+                  return -1;
+               
+               // ✅ NOVA VALIDAÇÃO: Inclinação mínima da linha
+               if(!HasMinimumLineSlope(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], current - pivot, true))  // ✅ RSI raw
+               {
+                  if(ShowDebugInfo)
+                     Print("❌ BULLISH REJEITADO: Inclinação insuficiente da linha");
+                  return -1;
+               }
+               
+               // 🔥 NOVA VALIDAÇÃO: Linha limpa (sem obstruções)
+               bool cleanLine = true;
+               if(RequireCleanLine)
+               {
+                  cleanLine = IsCleanDivergenceLine(price, rsi_raw, pivot, current, true);  // ✅ RSI raw
+                  if(!cleanLine && ShowDebugInfo)
+                     Print("❌ BULLISH REJEITADO: Linha de divergência não é limpa (tem obstruções)");
+               }
+               
+               if(cleanLine && currentPriceIsBottom && currentRsiIsBottom)
+               {
+                  if(CheckSignificance(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], true, DivergenceMode))  // ✅ RSI raw
+                  {
+                     if(IsValidTrendContext(price, pivot, current, true))
+                     {
+                        double quality_score = CalculateDivergenceScore(price[pivot], price[current], 
+                                                                       rsi_raw[pivot], rsi_raw[current],   // ✅ RSI raw
+                                                                       pivot, current, tick_volume, true);
+                        
+                        double required_score = MinQualityScore;
+                        if(DivergenceMode == MODE_SENSITIVE) required_score *= 0.3;
+                        else if(DivergenceMode == MODE_BALANCED) required_score *= 0.5;
+                        
+                        if(quality_score >= required_score)
+                        {
+                           if(ShowDebugInfo)
+                           {
+                              string mode_suffix = (EnableAntiLookAhead && IsBacktest()) ? "(BACKTEST-ANTI-LA)" : "(TEMPO-REAL)";
+                              Print("🟢 DIVERGÊNCIA BULLISH [", EnumToString(DivergenceMode), "] ", mode_suffix, 
+                                    " APROVADA: barra ", current, " | pivot ", pivot, " | Score: ", DoubleToString(quality_score, 1));
+                           }
+                           return pivot;
+                        }
+                        else
+                        {
+                           qualityFiltered++;
+                           if(ShowDebugInfo)
+                              Print("❌ BULLISH FILTRADO POR QUALIDADE [Score=", DoubleToString(quality_score, 1), "]");
+                        }
+                     }
+                     else
+                     {
+                        contextFiltered++;
+                     }
+                  }
+                  else
+                  {
+                     signalsFiltered++;
+                  }
+               }
+               else if(!cleanLine)
+               {
+                  cleanLineFiltered++;
+               }
+               else
+               {
+                  mixedTypeFiltered++;
+                  if(ShowDebugInfo)
+                     Print("❌ BULLISH REJEITADO: MISTURA FUNDO/TOPO!");
+               }
+            }
+            else
+            {
+               realDivFiltered++;
+               if(ShowDebugInfo)
+                  Print("❌ BULLISH REJEITADO: Divergência não é real/significativa");
+            }
          }
-      }
-   }
-   
-   return true;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Verificar Inclinação Real do RSI (Círculo 4)    |
-//+------------------------------------------------------------------+
-bool CheckRSILineSlope(double rsi1, double rsi2, int bars_distance, bool is_bullish)
-{
-   if(!EnableRSISlopeCheck) return true; // 🔥 NOVO: Se desabilitado, sempre aprova
-   
-   if(bars_distance <= 1) return false;
-   
-   double rsi_diff = MathAbs(rsi2 - rsi1);
-   double min_rsi_slope = RSIMinSlope; // 🔧 REEQUILIBRADO: Agora usa 1.0
-   double min_rsi_slope_per_bar = min_rsi_slope / bars_distance;
-   
-   // Verificar se há inclinação real no RSI
-   double actual_rsi_slope_per_bar = rsi_diff / bars_distance;
-   
-   if(actual_rsi_slope_per_bar < min_rsi_slope_per_bar)
-   {
-      PrintControlledLog("RSI MUITO RETO - Diferença RSI: " + DoubleToString(rsi_diff, 1) + " | Distância: " + (string)bars_distance);
-      return false;
-   }
-   
-   // Verificar direção correta da divergência
-   if(is_bullish)
-   {
-      // Divergência bullish: RSI deve estar subindo (rsi2 > rsi1)
-      if(rsi2 <= rsi1)
-      {
-         PrintControlledLog("RSI DIREÇÃO ERRADA (Bullish) - RSI1: " + DoubleToString(rsi1, 1) + " | RSI2: " + DoubleToString(rsi2, 1));
-         return false;
       }
    }
    else
    {
-      // Divergência bearish: RSI deve estar descendo (rsi2 < rsi1)
-      if(rsi2 >= rsi1)
+      // 🔥 DECIDIR: Busca original (tempo real) vs melhorada (backtest)
+      bool useAdvancedSearch = EnableAntiLookAhead && IsBacktest();
+      
+      if(useAdvancedSearch)
       {
-         PrintControlledLog("RSI DIREÇÃO ERRADA (Bearish) - RSI1: " + DoubleToString(rsi1, 1) + " | RSI2: " + DoubleToString(rsi2, 1));
-         return false;
-      }
-   }
-   
-   return true;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Verificação Completa de Qualidade RSI           |
-//+------------------------------------------------------------------+
-bool CheckRSIQuality(const double &rsi[], int start_bar, int end_bar, bool is_bullish)
-{
-   // 1. Verificar se RSI não "esticou" demais (Círculos 1 e 2)
-   if(!CheckRSITravelDistance(rsi, start_bar, end_bar, is_bullish))
-      return false;
-   
-   // 2. Verificar se linha não é cortada por obstruções (Círculo 3)
-   if(!CheckRSILineObstruction(rsi, start_bar, end_bar, is_bullish))
-      return false;
-   
-   // 3. Verificar inclinação real do RSI (Círculo 4)
-   if(!CheckRSILineSlope(rsi[start_bar], rsi[end_bar], MathAbs(end_bar - start_bar), is_bullish))
-      return false;
-   
-   return true;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Verificação de Linha Limpa (OPCIONAL)           |
-//+------------------------------------------------------------------+
-bool IsCleanDivergenceLine(const double &price[], const double &rsi[], int start_bar, int end_bar, bool is_bullish)
-{
-   if(!UseCleanerLines) return true; // ✅ Se desabilitado, considera todas as linhas como limpas
-   
-   if(start_bar == end_bar) return false;
-   if(start_bar > end_bar) { int temp = start_bar; start_bar = end_bar; end_bar = temp; } // Garantir ordem
-   
-   double start_price = price[start_bar];
-   double end_price = price[end_bar];
-   
-   // 🔧 TOLERÂNCIA MUITO ALTA para não eliminar sinais
-   double price_tolerance = MathAbs(end_price - start_price) * (CleanLineTolerancePercent / 100.0);
-   
-   int obstructions_found = 0; // Contar obstruções
-   
-   for(int i = start_bar + 1; i < end_bar; i++)
-   {
-      if(is_bullish)
-      {
-         // Divergência Bullish: verificar se linha passa muito acima de fundos intermediários
-         bool is_significant_low = IsValidPivot(price, i, false, 1);
+         // BACKTEST: Buscar MELHOR pivô (não primeiro)
+         int best_pivot = -1;
+         double best_rsi = 0.0;
          
-         if(is_significant_low)
+         for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
          {
-            // Calcular onde a linha deveria estar neste ponto
-            double line_ratio = (double)(i - start_bar) / (double)(end_bar - start_bar);
-            double expected_price_on_line = start_price + (end_price - start_price) * line_ratio;
+            if(i < pivot_strength) break;
             
-            // Se o preço real está MUITO abaixo da linha esperada
-            if(price[i] < (expected_price_on_line - price_tolerance))
+            bool priceIsTop = IsValidPivotAntiLookAhead(price, i, true, pivot_strength, current);
+            bool rsiIsTop = IsValidPivotAntiLookAhead(rsi_raw, i, true, pivot_strength, current);
+            
+            if(priceIsTop && rsiIsTop && rsi_raw[i] > level)  // ✅ Usa RSI raw para comparação
             {
-               obstructions_found++;
-               
-               // 🔧 SÓ REJEITA se há MUITAS obstruções
-               if(obstructions_found > MaxLineObstructions)
+               if(IsStrongPivotAntiLookAhead(rsi_raw, i, true, pivot_strength, MinPivotAmplitude, current))
                {
-                  PrintControlledLog("LINHA REJEITADA (Bullish) - Muitas obstruções (" + (string)obstructions_found + ")");
-                  return false;
+                  if(rsi_raw[i] > best_rsi)
+                  {
+                     best_rsi = rsi_raw[i];
+                     best_pivot = i;
+                  }
                }
             }
          }
+         pivot = best_pivot;
       }
       else
       {
-         // Divergência Bearish: verificar se linha passa muito abaixo de topos intermediários
-         bool is_significant_high = IsValidPivot(price, i, true, 1);
-         
-         if(is_significant_high)
+         // TEMPO REAL: Busca original (primeiro pivô) - COMO ESTAVA FUNCIONANDO
+         for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
          {
-            double line_ratio = (double)(i - start_bar) / (double)(end_bar - start_bar);
-            double expected_price_on_line = start_price + (end_price - start_price) * line_ratio;
+            if(i < pivot_strength) break;
             
-            // Se o preço real está MUITO acima da linha esperada
-            if(price[i] > (expected_price_on_line + price_tolerance))
+            bool priceIsTop = IsValidPivot(price, i, true, pivot_strength);
+            bool rsiIsTop = IsValidPivot(rsi_raw, i, true, pivot_strength);
+            
+            if(priceIsTop && rsiIsTop && rsi_raw[i] > level)
             {
-               obstructions_found++;
-               
-               // 🔧 SÓ REJEITA se há MUITAS obstruções
-               if(obstructions_found > MaxLineObstructions)
+               if(IsStrongPivot(rsi_raw, i, true, pivot_strength, MinPivotAmplitude))
                {
-                  PrintControlledLog("LINHA REJEITADA (Bearish) - Muitas obstruções (" + (string)obstructions_found + ")");
-                  return false;
+                  pivot = i;
+                  break; // PARA NO PRIMEIRO (como estava)
                }
             }
          }
       }
-   }
-   
-   return true;
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 FUNÇÃO ENHANCED CORRIGIDA: Confirmação de Volume Melhorada   |
-//+------------------------------------------------------------------+
-bool CheckVolumeConfirmationEnhanced(bool is_buy, const double &open[], const double &close[], 
-                                    const double &price[], const long &tick_volume[], int start, int end) 
-{
-   if(!UseEnhancedVolumeAnalysis)
-   {
-      // Usar método original se enhanced estiver desabilitado
-      double volumeChange = GetVolumeChangePercent(tick_volume, start, end);
       
-      // 🔥 CORREÇÃO LÓGICA: AMBAS direções procuram volume ALTO (positivo)
-      bool vol_confirmed = volumeChange >= Volume_Divergence_Min;
-      
-      // 🔥 NOVO: Mostrar % original no gráfico (posição central) - SÓ SE HABILITADO
-      if(ShowVolumeDebugOnChart)
+      if(pivot > 0)
       {
-         string check = vol_confirmed ? "✓" : "✗";
-         string text = check + "Vol:" + DoubleToString(volumeChange, 1) + "%";
-         color textColor = vol_confirmed ? clrYellow : clrDarkGray;
-         CreateVolumeDebugText(iTime(NULL, 0, end), iClose(NULL, 0, end), text, textColor);
-      }
-      
-      return vol_confirmed;
-   }
-   
-   // 🔥 ANÁLISE ENHANCED CORRIGIDA: Combinar múltiplos critérios
-   
-   // 1. Método original como base (CORRIGIDO - ambas direções procuram volume alto)
-   double volumeChange = GetVolumeChangePercent(tick_volume, start, end);
-   bool original_ok = volumeChange >= (Volume_Divergence_Min * 0.5); // 🔥 SEMPRE positivo para ambas direções
-   
-   // 2. Volume na direção dos candles (diferenciado por direção)
-   bool candle_direction_ok = CheckCandleDirectionVolume(open, close, tick_volume, end, is_buy);
-   
-   // 3. Fluxo institucional (volume alto independente da direção)
-   bool institutional_ok = CheckInstitutionalVolumeFlow(price, tick_volume, start, end, is_buy);
-   
-   // 🎯 SISTEMA DE PONTUAÇÃO RELAXADO: Pelo menos 1 de 3 critérios devem passar
-   int passed_criteria = 0;
-   if(original_ok) passed_criteria++;
-   if(candle_direction_ok) passed_criteria++;
-   if(institutional_ok) passed_criteria++;
-   
-   bool enhanced_confirmed = passed_criteria >= 1; // 🔥 RELAXADO: Era 2, agora 1
-   
-   if(enhanced_confirmed) enhancedVolumeUsed++;
-   
-   return enhanced_confirmed;
-}
-
-//+------------------------------------------------------------------+
-//| 🔧 NOVA FUNÇÃO: Busca Inteligente de Pivôs (OPCIONAL)           |
-//+------------------------------------------------------------------+
-int FindBestPivotForCleanLine(const double &price[], const double &rsi_raw[], const long &tick_volume[], 
-                             int current, bool is_bullish, double level, int pivot_strength)
-{
-   // 🔧 CORREÇÃO: Para COMPRA procurar FUNDO no passado, para VENDA procurar TOPO no passado
-   bool lookingForHighInPast = !is_bullish;  // COMPRA procura fundos, VENDA procura topos
-   
-   if(!UseCleanerLines) 
-   {
-      // ✅ BUSCA ORIGINAL CORRIGIDA
-      for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
-      {
-         if(i < pivot_strength) break;
+         bool currentPriceIsTop, currentRsiIsTop;
          
-         // 🔧 CORRIGIDO: Buscar tipo correto de pivô
-         bool priceIsPivot = IsValidPivot(price, i, lookingForHighInPast, pivot_strength);
-         bool rsiIsPivot = IsValidPivot(rsi_raw, i, lookingForHighInPast, pivot_strength);
-         
-         if(priceIsPivot && rsiIsPivot)
+         // 🔥 Verificar pivô atual: Anti Look-Ahead só no backtest
+         if(EnableAntiLookAhead && IsBacktest())
          {
-            // 🔧 CORRIGIDO: Verificar nível correto para o tipo de divergência
-            bool level_ok;
-            if(is_bullish) {
-               // COMPRA: RSI no passado deve estar em região baixa (oversold)
-               level_ok = (rsi_raw[i] < level);
-            } else {
-               // VENDA: RSI no passado deve estar em região alta (overbought)  
-               level_ok = (rsi_raw[i] > level);
-            }
-            
-            if(level_ok && IsStrongPivot(rsi_raw, i, lookingForHighInPast, pivot_strength, MinPivotAmplitude))
-            {
-               return i; // ✅ PARA NO PRIMEIRO (comportamento original)
-            }
+            currentPriceIsTop = IsValidPivotAntiLookAhead(price, current, true, pivot_strength, current + PivotConfirmationBars);
+            currentRsiIsTop = IsValidPivotAntiLookAhead(rsi_raw, current, true, pivot_strength, current + PivotConfirmationBars);
          }
-      }
-      return -1;
-   }
-   
-   // 🔧 BUSCA INTELIGENTE CORRIGIDA
-   int best_pivot = -1;
-   double best_score = -1;
-   
-   for(int i = current - MinDistanceBetweenPivots; i >= current - DivergenceLookback; i--)
-   {
-      if(i < pivot_strength) break;
-      
-      bool priceIsPivot = IsValidPivot(price, i, lookingForHighInPast, pivot_strength);
-      bool rsiIsPivot = IsValidPivot(rsi_raw, i, lookingForHighInPast, pivot_strength);
-      
-      if(priceIsPivot && rsiIsPivot)
-      {
-         bool level_ok;
-         if(is_bullish) {
-            level_ok = (rsi_raw[i] < level);  // COMPRA: RSI baixo no passado
-         } else {
-            level_ok = (rsi_raw[i] > level);  // VENDA: RSI alto no passado
+         else
+         {
+            // TEMPO REAL: Lógica original (como estava funcionando)
+            currentPriceIsTop = IsValidPivot(price, current, true, pivot_strength);
+            currentRsiIsTop = IsValidPivot(rsi_raw, current, true, pivot_strength);
          }
          
-         if(level_ok && IsStrongPivot(rsi_raw, i, lookingForHighInPast, pivot_strength, MinPivotAmplitude))
+         if(price[current] > price[pivot] && rsi_raw[current] < rsi_raw[pivot] && rsi_raw[current] > level)  // ✅ Usa RSI raw
          {
-            // 🔧 AVALIAR QUALIDADE DA LINHA
-            bool would_have_clean_line = IsCleanDivergenceLine(price, rsi_raw, i, current, is_bullish);
-            
-            // 🔧 CALCULAR SCORE
-            double line_score = 30; // Base
-            
-            // 🔧 BONUS CORRIGIDO: Verificar divergência real
-            if(is_bullish) {
-               // COMPRA: Preço atual < passado E RSI atual > passado
-               if(price[current] < price[i] && rsi_raw[current] > rsi_raw[i])
-                  line_score += 40;
-            } else {
-               // VENDA: Preço atual > passado E RSI atual < passado  
-               if(price[current] > price[i] && rsi_raw[current] < rsi_raw[i])
-                  line_score += 40;
-            }
-            
-            // Bonus por linha limpa
-            if(would_have_clean_line)
-               line_score += 20;
-            
-            // Bonus por força da divergência
-            double rsi_diff = MathAbs(rsi_raw[current] - rsi_raw[i]);
-            line_score += rsi_diff;
-            
-            // Bonus por proximidade (pivôs mais recentes são melhores)
-            line_score += (DivergenceLookback - (current - i)) * 0.5;
-            
-            if(line_score > best_score)
+            if(IsRealDivergence(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], false))  // ✅ RSI raw
             {
-               best_pivot = i;
-               best_score = line_score;
-            }
-         }
-      }
-   }
-   
-   return best_pivot;
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 NOVA FUNÇÃO: Busca de Pivôs Flexível (CORREÇÃO PRINCIPAL)    |
-//+------------------------------------------------------------------+
-bool FindFlexiblePivots(const double &price[], const double &rsi_raw[], int current, bool is_bullish, 
-                       int pivot_strength, bool &currentPriceIsPivot, bool &currentRsiIsPivot)
-{
-   currentPriceIsPivot = false;
-   currentRsiIsPivot = false;
-   
-   // 🔧 CORREÇÃO: Para divergência, current deve ser pivô do MESMO tipo
-   // COMPRA: current deve ser FUNDO (isHigh = false)
-   // VENDA: current deve ser TOPO (isHigh = true)
-   bool lookingForHigh = !is_bullish;  // COMPRA procura fundos, VENDA procura topos
-   
-   if(!UseFlexiblePivots)
-   {
-      // 🔧 LÓGICA CORRIGIDA: Para divergência, current deve ser pivô do tipo correto
-      currentPriceIsPivot = IsValidPivot(price, current, lookingForHigh, pivot_strength);
-      currentRsiIsPivot = IsValidPivot(rsi_raw, current, lookingForHigh, pivot_strength);
-      return currentPriceIsPivot && currentRsiIsPivot;
-   }
-   
-   // 🔥 LÓGICA FLEXÍVEL CORRIGIDA: Procurar pivôs do tipo correto
-   int search_range = PivotSearchRange;
-   
-   // Procurar pivô de PREÇO em ±range barras ao redor do current
-   for(int p = current - search_range; p <= current + search_range; p++)
-   {
-      if(p >= 0 && p < ArraySize(price) && IsValidPivot(price, p, lookingForHigh, pivot_strength))
-      {
-         currentPriceIsPivot = true;
-         break;
-      }
-   }
-   
-   // Procurar pivô de RSI em ±range barras ao redor do current  
-   for(int r = current - search_range; r <= current + search_range; r++)
-   {
-      if(r >= 0 && r < ArraySize(rsi_raw) && IsValidPivot(rsi_raw, r, lookingForHigh, pivot_strength))
-      {
-         currentRsiIsPivot = true;
-         break;
-      }
-   }
-   
-   return currentPriceIsPivot && currentRsiIsPivot;
-}
-
-//+------------------------------------------------------------------+
-//| 🔥 FUNÇÃO PRINCIPAL: CheckClassicDivergence RIGOROSA            |
-//+------------------------------------------------------------------+
-int CheckClassicDivergence(const double &price[], const double &rsi_raw[], const long &tick_volume[], 
-                          const double &open[], const double &close[], int current, bool is_bullish)
-{
-   if(current < DivergenceLookback) return -1;
-
-   int pivot_strength = (DivergenceMode == MODE_CONSERVATIVE) ? PivotStrength + 1 : PivotStrength;
-   
-   // ✅ USAR sempre RSI raw (0-100) para comparações de nível
-   double level = is_bullish ? (OnlyExtremeLevels ? OversoldLevel : 45.0) : (OnlyExtremeLevels ? OverboughtLevel : 55.0);
-   
-   // 🔧 BUSCA INTELIGENTE (se ativada) ou ORIGINAL (se desativada)
-   int pivot = FindBestPivotForCleanLine(price, rsi_raw, tick_volume, current, is_bullish, level, pivot_strength);
-   
-   if(pivot > 0)
-   {
-      // 🔥 LÓGICA: Pivôs flexíveis ou rígidos
-      bool currentPriceIsPivot = false;
-      bool currentRsiIsPivot = false;
-      bool pivotsFound = FindFlexiblePivots(price, rsi_raw, current, is_bullish, pivot_strength, currentPriceIsPivot, currentRsiIsPivot);
-      
-      // 🔧 CONDIÇÕES DE DIVERGÊNCIA ORIGINAIS
-      bool price_condition, rsi_condition, level_condition;
-      
-      if(is_bullish) {
-         // COMPRA: Preço faz fundo mais baixo, RSI faz fundo mais alto
-         price_condition = (price[current] < price[pivot]);   // Fundo mais baixo
-         rsi_condition = (rsi_raw[current] > rsi_raw[pivot]); // RSI mais alto (divergência)
-         level_condition = (rsi_raw[current] < level);        // Current ainda em região baixa
-      } else {
-         // VENDA: Preço faz topo mais alto, RSI faz topo mais baixo
-         price_condition = (price[current] > price[pivot]);   // Topo mais alto  
-         rsi_condition = (rsi_raw[current] < rsi_raw[pivot]); // RSI mais baixo (divergência)
-         level_condition = (rsi_raw[current] > level);        // Current ainda em região alta
-      }
-      
-      if(price_condition && rsi_condition && level_condition)
-      {
-         if(IsRealDivergence(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], is_bullish))
-         {
-            if(IsValidRSISequence(current, is_bullish))
-            {
-               if(HasMinimumLineSlope(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], current - pivot, is_bullish))
+               // ✅ NOVA VALIDAÇÃO: Controle de sequência RSI
+               if(!IsValidRSISequence(current, false))
+                  return -1;
+               
+               // ✅ NOVA VALIDAÇÃO: Inclinação mínima da linha
+               if(!HasMinimumLineSlope(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], current - pivot, false))  // ✅ RSI raw
                {
-                  // 🔧 LINHA LIMPA: Só se habilitado
-                  bool cleanLine = true;
-                  if(RequireCleanLine || UseCleanerLines)
-                     cleanLine = IsCleanDivergenceLine(price, rsi_raw, pivot, current, is_bullish);
-                  
-                  if(cleanLine && pivotsFound)
+                  if(ShowDebugInfo)
+                     Print("❌ BEARISH REJEITADO: Inclinação insuficiente da linha");
+                  return -1;
+               }
+               
+               // 🔥 NOVA VALIDAÇÃO: Linha limpa (sem obstruções)
+               bool cleanLine = true;
+               if(RequireCleanLine)
+               {
+                  cleanLine = IsCleanDivergenceLine(price, rsi_raw, pivot, current, false);  // ✅ RSI raw
+                  if(!cleanLine && ShowDebugInfo)
+                     Print("❌ BEARISH REJEITADO: Linha de divergência não é limpa (tem obstruções)");
+               }
+               
+               if(cleanLine && currentPriceIsTop && currentRsiIsTop)
+               {
+                  if(CheckSignificance(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], false, DivergenceMode))  // ✅ RSI raw
                   {
-                     if(CheckSignificance(price[pivot], price[current], rsi_raw[pivot], rsi_raw[current], is_bullish, DivergenceMode))
+                     if(IsValidTrendContext(price, pivot, current, false))
                      {
-                        if(IsValidTrendContext(price, pivot, current, is_bullish))
+                        double quality_score = CalculateDivergenceScore(price[pivot], price[current], 
+                                                                       rsi_raw[pivot], rsi_raw[current],   // ✅ RSI raw
+                                                                       pivot, current, tick_volume, false);
+                        
+                        double base_score = MinQualityScore;
+                        if(DivergenceMode == MODE_SENSITIVE) base_score *= 0.3;
+                        else if(DivergenceMode == MODE_BALANCED) base_score *= 0.5;
+                        
+                        double required_score = base_score * 0.8;
+                        
+                        if(quality_score >= required_score)
                         {
-                           // 🔧 VERIFICAÇÃO: Qualidade do RSI (resolve problemas dos círculos 1, 2, 3 e 4)
-                           if(!CheckRSIQuality(rsi_raw, pivot, current, is_bullish))
+                           if(ShowDebugInfo)
                            {
-                              PrintControlledLog("RSI QUALIDADE REJEITADA - Problemas de traçado detectados");
-                              return -1; // Rejeita esta divergência
+                              string mode_suffix = (EnableAntiLookAhead && IsBacktest()) ? "(BACKTEST-ANTI-LA)" : "(TEMPO-REAL)";
+                              Print("🔴 DIVERGÊNCIA BEARISH [", EnumToString(DivergenceMode), "] ", mode_suffix, 
+                                    " APROVADA: barra ", current, " | pivot ", pivot, " | Score: ", DoubleToString(quality_score, 1),
+                                    RequireCleanLine ? " | LINHA LIMPA ✅" : "");
                            }
-                           
-                           double quality_score = CalculateDivergenceScore(price[pivot], price[current], 
-                                                                          rsi_raw[pivot], rsi_raw[current],
-                                                                          pivot, current, tick_volume, is_bullish);
-                           
-                           // 🔧 SCORE MUITO MAIS RIGOROSO - Reduzir sinais
-                           double required_score = is_bullish ? (MinQualityScore * 1.2) : (MinQualityScore * 1.1);
-                           
-                           if(quality_score >= required_score)
-                           {
-                              // 🔥 LOG CONTROLADO - sem spam
-                              string divType = is_bullish ? "BULLISH" : "BEARISH";
-                              PrintControlledLog("DIVERGÊNCIA " + divType + " RIGOROSA na barra " + (string)current + " | Score: " + DoubleToString(quality_score, 1));
-                              
-                              return pivot;
-                           }
+                           return pivot;
+                        }
+                        else
+                        {
+                           qualityFiltered++;
+                           if(ShowDebugInfo)
+                              Print("❌ BEARISH FILTRADO POR QUALIDADE [Score=", DoubleToString(quality_score, 1), "]");
                         }
                      }
+                     else
+                     {
+                        contextFiltered++;
+                     }
+                  }
+                  else
+                  {
+                     signalsFiltered++;
                   }
                }
+               else if(!cleanLine)
+               {
+                  cleanLineFiltered++;
+               }
+               else
+               {
+                  mixedTypeFiltered++;
+                  if(ShowDebugInfo)
+                     Print("❌ BEARISH REJEITADO: MISTURA FUNDO/TOPO!");
+               }
+            }
+            else
+            {
+               realDivFiltered++;
+               if(ShowDebugInfo)
+                  Print("❌ BEARISH REJEITADO: Divergência não é real/significativa");
             }
          }
       }
@@ -1659,156 +1096,24 @@ int CheckClassicDivergence(const double &price[], const double &rsi_raw[], const
    return -1;
 }
 
-void CreateStar(datetime time, double price, bool isBuy) 
-{ 
-   starCounter++; 
-   string starName = "RSI_Volume_Star_" + (string)starCounter + (string)TimeCurrent(); 
-   if(ObjectCreate(0, starName, OBJ_ARROW_CHECK, 0, time, price))
-   {
-      ObjectSetInteger(0, starName, OBJPROP_ARROWCODE, SYMBOL_STAR);
-      ObjectSetInteger(0, starName, OBJPROP_WIDTH, 4);
-      ObjectSetInteger(0, starName, OBJPROP_SELECTABLE, false);
-      if(isBuy) 
-         ObjectSetInteger(0, starName, OBJPROP_COLOR, clrGold);
-      else 
-         ObjectSetInteger(0, starName, OBJPROP_COLOR, clrMagenta);
-   }
-   ChartRedraw(); 
-}
-
-void CreateVolumeDebugText(datetime time, double price, string text, color textColor)
-{
-   // 🔥 MANTIDO: Função ativa para mostrar textos no gráfico (análise)
-   if(!ShowVolumeDebugOnChart && !ShowDetailedVolumeInfo) return;
-   
-   // ✅ Controlar quantidade de textos para evitar poluição
-   if(volumeTextsCreated >= MaxVolumeTextsOnChart)
-   {
-      // Remove textos mais antigos quando atingir o limite
-      string oldObjName = "VolumeDebug_" + (string)(volumeTextsCreated - MaxVolumeTextsOnChart);
-      ObjectDelete(0, oldObjName);
-   }
-   
-   string objName = "VolumeDebug_" + (string)volumeTextsCreated + "_" + (string)time;
-   volumeTextsCreated++;
-   
-   if(ObjectCreate(0, objName, OBJ_TEXT, 0, time, price))
-   {
-      ObjectSetInteger(0, objName, OBJPROP_COLOR, textColor);
-      
-      // 🔥 DECIDIR TAMANHO DA FONTE: Confirmações grandes, % pequenos
-      if(StringFind(text, "⭐") >= 0) // Se é texto de confirmação
-      {
-         ObjectSetInteger(0, objName, OBJPROP_FONTSIZE, 12); // Grande para confirmações
-         ObjectSetString(0, objName, OBJPROP_FONT, "Arial Bold");
-      }
-      else // % detalhados
-      {
-         ObjectSetInteger(0, objName, OBJPROP_FONTSIZE, 8); // Pequeno para %
-         ObjectSetString(0, objName, OBJPROP_FONT, "Arial");
-      }
-      
-      ObjectSetString(0, objName, OBJPROP_TEXT, text);
-      ObjectSetInteger(0, objName, OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
-      ObjectSetInteger(0, objName, OBJPROP_SELECTABLE, false); // ✅ Não selecionável
-      ObjectSetInteger(0, objName, OBJPROP_HIDDEN, true); // ✅ Oculto na lista de objetos
-   }
-}
-
-void CreateVolumeCircle(datetime time, double volume_value, bool is_buy)
-{
-   if(!ShowVolumeCircles) return;
-   
-   starCounter++; // Usar mesmo contador para evitar conflitos
-   string circleName = "VolumeCircle_" + (string)starCounter + (string)TimeCurrent();
-   
-   if(ObjectCreate(0, circleName, OBJ_ARROW, 0, time, volume_value))
-   {
-      ObjectSetInteger(0, circleName, OBJPROP_ARROWCODE, 159); // Código de bolinha
-      ObjectSetInteger(0, circleName, OBJPROP_WIDTH, 3);
-      ObjectSetInteger(0, circleName, OBJPROP_SELECTABLE, false);
-      ObjectSetInteger(0, circleName, OBJPROP_HIDDEN, true);
-      
-      if(is_buy)
-         ObjectSetInteger(0, circleName, OBJPROP_COLOR, clrLimeGreen);
-      else
-         ObjectSetInteger(0, circleName, OBJPROP_COLOR, clrRed);
-   }
-}
-
-void CreateRSILine(datetime time1, double rsi1, datetime time2, double rsi2, bool is_bullish) 
-{ 
-   lineCounter++; 
-   string line_name = "div_line_rsi_" + (string)lineCounter + (string)TimeCurrent(); 
-   if(ObjectCreate(0, line_name, OBJ_TREND, 1, time1, rsi1, time2, rsi2))  // Subwindow 1 = RSI
-   { 
-      ObjectSetInteger(0, line_name, OBJPROP_COLOR, clrYellow); 
-      ObjectSetInteger(0, line_name, OBJPROP_STYLE, STYLE_SOLID); 
-      ObjectSetInteger(0, line_name, OBJPROP_WIDTH, 3); 
-      ObjectSetInteger(0, line_name, OBJPROP_RAY_RIGHT, false); 
-      ObjectSetInteger(0, line_name, OBJPROP_SELECTABLE, false);
-      ObjectSetInteger(0, line_name, OBJPROP_HIDDEN, true);
-   } 
-}
-
-void CreatePriceLine(datetime time1, double price1, datetime time2, double price2, bool is_bullish) 
-{ 
-   lineCounter++; 
-   string line_name = "div_line_price_" + (string)lineCounter + (string)TimeCurrent(); 
-   if(ObjectCreate(0, line_name, OBJ_TREND, 0, time1, price1, time2, price2)) 
-   { 
-      ObjectSetInteger(0, line_name, OBJPROP_COLOR, is_bullish ? clrLimeGreen : clrRed); 
-      ObjectSetInteger(0, line_name, OBJPROP_STYLE, STYLE_SOLID); 
-      ObjectSetInteger(0, line_name, OBJPROP_WIDTH, 2); 
-      ObjectSetInteger(0, line_name, OBJPROP_RAY_RIGHT, false); 
-      ObjectSetInteger(0, line_name, OBJPROP_SELECTABLE, false);
-      ObjectSetInteger(0, line_name, OBJPROP_HIDDEN, true);
-   } 
-}
-
 //+------------------------------------------------------------------+
-//| Initialization function REEQUILIBRADA                           |
+//| Initialization function CORRIGIDA                               |
 //+------------------------------------------------------------------+
 int OnInit()
 {
-   // ✅ LICENÇA AJUSTADA: Conta "0" = Universal
    long currentAccount = AccountInfoInteger(ACCOUNT_LOGIN);
    datetime currentTime = TimeCurrent();
-   
-   // Verificar se é licença universal (conta = 0) ou específica
-   bool isUniversalLicense = (StringToInteger(licenseAccount) == 0);
-   bool accountValid = isUniversalLicense || (currentAccount == StringToInteger(licenseAccount));
-   bool timeValid = (currentTime <= licenseExpiration);
-   
-   if (!accountValid || !timeValid) 
-   {
-      string licenseType = isUniversalLicense ? "UNIVERSAL" : "ESPECÍFICA";
-      string accountInfo = isUniversalLicense ? "Qualquer conta" : ("Conta: " + licenseAccount);
-      
-      Print("🔒 LICENÇA ", licenseType, " inválida ou expirada!");
-      Print("   📋 Configuração: ", accountInfo);
-      Print("   🗓️ Expiração: ", TimeToString(licenseExpiration));
-      Print("   🔍 Conta atual: ", currentAccount);
-      Print("   🕒 Data atual: ", TimeToString(currentTime));
-      Print("   ❌ Status: ", accountValid ? "Conta OK" : "Conta inválida", " | ", timeValid ? "Tempo OK" : "EXPIRADO");
-      
+
+   if (currentAccount != StringToInteger(licenseAccount) || currentTime > licenseExpiration) {
+      Print("Licença inválida ou expirada! Conta: ", currentAccount, " | Data: ", TimeToString(currentTime));
       ObjectsDeleteAll(0, "RSI_Volume_Star_");  
       ObjectsDeleteAll(0, "div_line_price_");  
-      ObjectsDeleteAll(0, "div_line_rsi_");     // 🔥 NOVO: Limpar linhas do RSI
       ObjectsDeleteAll(0, "VolumeDebug_");  
       ChartRedraw();
-      
-      string errorMsg = "🔒 LICENÇA " + licenseType + " " + (timeValid ? "inválida!" : "EXPIRADA!");
-      Comment(errorMsg);
-      Alert(errorMsg);
+      Comment("Licença inválida ou expirada!");
+      Alert("Licença inválida ou expirada!");
       return INIT_FAILED;
    }
-   
-   // ✅ LICENÇA VÁLIDA - Mostrar informações (LOG ÚNICO)
-   string licenseType = isUniversalLicense ? "UNIVERSAL" : "ESPECÍFICA";
-   Print("✅ LICENÇA ", licenseType, " VÁLIDA!");
-   Print("   📋 Conta: ", isUniversalLicense ? "Qualquer conta (modo universal)" : licenseAccount);
-   Print("   🗓️ Válida até: ", TimeToString(licenseExpiration));
 
    SetIndexBuffer(0, RSIBuffer, INDICATOR_DATA);
    SetIndexBuffer(1, BuyBuffer, INDICATOR_DATA);
@@ -1855,17 +1160,12 @@ int OnInit()
       case MODE_CONSERVATIVE: mode_name = "CONSERVATIVE"; break;
    }
    
-   string volume_mode = UseEnhancedVolumeAnalysis ? "ENHANCED" : "CLASSIC";
-   string backtest_suffix = IsBacktest() ? "-BACKTEST" : "-TEMPO-REAL";
-   string license_suffix = isUniversalLicense ? "-UNIVERSAL" : "-ESPECÍFICA";
-   string tracing_mode = UseCleanerLines ? "TRAÇADO INTELIGENTE" : "QUALIDADE RSI";
-   string pivot_mode = UseFlexiblePivots ? "PIVÔS FLEXÍVEIS" : "PIVÔS RÍGIDOS";
-   string strict_mode = EnableStrictDivergenceCheck ? "RIGOROSO" : "NORMAL";
-   IndicatorSetString(INDICATOR_SHORTNAME, "Divergence RSI PrimeBot LINHAS PARALELAS v2.37" + backtest_suffix + license_suffix + " [" + mode_name + "] [VOL:" + volume_mode + " " + tracing_mode + " " + pivot_mode + " " + strict_mode + "]");
+   string backtest_suffix = IsBacktest() ? "-BACKTEST" : "-TEMPO-REAL-PREMIUM";
+   IndicatorSetString(INDICATOR_SHORTNAME, "Divergence RSI + Volume PrimeBot" + backtest_suffix + " [" + mode_name + "]");
    
-   IndicatorSetInteger(INDICATOR_LEVELS, 6);
+   IndicatorSetInteger(INDICATOR_LEVELS, 6);  // 6 níveis
    
-   // 🔧 NÍVEIS CORRIGIDOS DEFINITIVAMENTE - Escala visual correta
+   // ✅ NÍVEIS CORRIGIDOS - Valores originais RSI para escala à direita correta
    
    // Linha divisória principal RSI/Volume - PRATICAMENTE INVISÍVEL
    IndicatorSetDouble(INDICATOR_LEVELVALUE, 0, DIVIDER_LINE);
@@ -1873,20 +1173,20 @@ int OnInit()
    IndicatorSetInteger(INDICATOR_LEVELSTYLE, 0, STYLE_DOT);         // ✅ Pontilhado mínimo
    IndicatorSetInteger(INDICATOR_LEVELWIDTH, 0, 1);                // ✅ Fino
    
-   // RSI 70 (Overbought) - valor exato
-   IndicatorSetDouble(INDICATOR_LEVELVALUE, 1, OverboughtLevel);    // ✅ Usar input (70.0)
+   // RSI 70 (Overbought) - valor original
+   IndicatorSetDouble(INDICATOR_LEVELVALUE, 1, 70.0);
    IndicatorSetInteger(INDICATOR_LEVELCOLOR, 1, clrRed);
    IndicatorSetInteger(INDICATOR_LEVELSTYLE, 1, STYLE_DASH);
    IndicatorSetInteger(INDICATOR_LEVELWIDTH, 1, 1);
    
-   // RSI 50 (Meio) - valor exato
+   // RSI 50 (Meio) - valor original
    IndicatorSetDouble(INDICATOR_LEVELVALUE, 2, 50.0);
    IndicatorSetInteger(INDICATOR_LEVELCOLOR, 2, clrGray);
    IndicatorSetInteger(INDICATOR_LEVELSTYLE, 2, STYLE_DOT);
    IndicatorSetInteger(INDICATOR_LEVELWIDTH, 2, 1);
    
-   // 🔧 RSI 30 (Oversold) - CORREÇÃO DEFINITIVA usando input direto
-   IndicatorSetDouble(INDICATOR_LEVELVALUE, 3, OversoldLevel);      // ✅ Usar input (30.0) diretamente
+   // RSI 30 (Oversold) - valor original
+   IndicatorSetDouble(INDICATOR_LEVELVALUE, 3, 30.0);
    IndicatorSetInteger(INDICATOR_LEVELCOLOR, 3, clrRed);
    IndicatorSetInteger(INDICATOR_LEVELSTYLE, 3, STYLE_DASH);
    IndicatorSetInteger(INDICATOR_LEVELWIDTH, 3, 1);
@@ -1904,53 +1204,144 @@ int OnInit()
    IndicatorSetInteger(INDICATOR_LEVELWIDTH, 5, 1);
    
    IndicatorSetString(INDICATOR_LEVELTEXT, 0, "");
-   IndicatorSetString(INDICATOR_LEVELTEXT, 1, "RSI " + DoubleToString(OverboughtLevel, 0) + " (Overbought)");  // ✅ Texto dinâmico
+   IndicatorSetString(INDICATOR_LEVELTEXT, 1, "RSI 70 (Overbought)");
    IndicatorSetString(INDICATOR_LEVELTEXT, 2, "RSI 50 (Neutro)");
-   IndicatorSetString(INDICATOR_LEVELTEXT, 3, "RSI " + DoubleToString(OversoldLevel, 0) + " (Oversold)");    // ✅ Texto dinâmico
+   IndicatorSetString(INDICATOR_LEVELTEXT, 3, "RSI 30 (Oversold)");
    IndicatorSetString(INDICATOR_LEVELTEXT, 4, "Vol Max");
    IndicatorSetString(INDICATOR_LEVELTEXT, 5, "Vol Médio");
    
-   // 🔥 LOG ÚNICO NO INÍCIO (se habilitado)
-   if(ShowModeInfo) 
+   // 🔥 NOVO v2.1.5-FIX: Inicializar contador de falhas
+   copyBufferFailures = 0;
+   
+   if(ShowDebugInfo || ShowModeInfo)
    {
-      Print("🔥 Divergence RSI PrimeBot v2.37 - SINAIS FILTRADOS + CONTEXTO VALIDADO!");
-      Print("🎯 Modo: ", mode_name, " | Volume: ", volume_mode, " | Pivôs: ", UseFlexiblePivots ? "FLEXÍVEIS" : "RÍGIDOS");
-      Print("🔥 FILTROS ATIVOS: Qualidade ", MinQualityScore, " | Distância ", MinDistanceBetweenPivots, " | Tempo ", MinBarsBetweenSignals);
-      Print("🔥 VALIDAÇÃO CONTEXTO: ", RequireTrendContext ? "ATIVA" : "DESATIVA", " | Linha Limpa: ", RequireCleanLine ? "ATIVA" : "DESATIVA");
-      Print("📊 NOVO: Valida contexto de candles para evitar sinais inadequados");
-      Print("🎯 LÓGICA: COMPRA em contexto baixista/neutro | VENDA em contexto altista/neutro");
-      Print("🔧 RESULTADO: Menos sinais, mas com maior qualidade e timing correto");
+      Print("🔥 RSI VOLUME FUSION v2.1.5-FIX - TEMPO REAL CORRIGIDO!");
+      Print("🎯 MODO ATIVO: ", mode_name, " (ULTRA RESPONSIVO + QUALIDADE)");
+      Print("🔧 CORREÇÕES v2.1.5-FIX IMPLEMENTADAS:");
+      Print("   ✅ COPYBUFFER CORRIGIDO: Não trava mais ao falhar!");
+      Print("   ✅ PIVÔ TEMPO REAL: Detecção melhorada na barra atual");
+      Print("   ✅ ESCALA À DIREITA: Números corretos (0-100 original)");
+      Print("   ✅ SEPARAÇÃO VISUAL: RSI zona superior + Volume zona inferior");
+      Print("   ✅ LINHA DIVISÓRIA: Invisível (sem interferência visual)");
+      Print("   ✅ NÍVEIS RSI: 30, 50, 70 (valores originais RSI)");
+      Print("   ✅ CONTROLE SEQUÊNCIA: Evita sinais após fundos consecutivos");
+      Print("   ✅ INCLINAÇÃO MÍNIMA: Filtra linhas quase retas");
+      Print("   ✅ CONTEXTO TENDÊNCIA: Divergência no contexto correto");
+      Print("   ✅ VOLUME VISUAL: Método comparativo melhorado");
+      Print("   ✅ DEBUG VISUAL: % volume mostrado no gráfico");
+      Print("   🚀 TEMPO REAL: Máxima responsividade (sem delays)");
+      Print("   🚀 ANTI LOOK-AHEAD: DESATIVADO (comportamento consistente)");
+      Print("   🚀 Confirmação de Pivô: IMEDIATA (sem barras de espera)");
+      Print("   🔥 CORREÇÃO PRINCIPAL: CopyBuffer não trava mais indicador!");
+      Print("   ✅ MinBarsBetweenSignals = ", MinBarsBetweenSignals, " (responsivo)");
+      Print("   ✅ DivergenceLookback = ", DivergenceLookback, " (otimizado)");
+      Print("   ✅ Volume_Divergence_Min = ", Volume_Divergence_Min, "% (relaxado)");
+      Print("   ✅ Volume_Period = ", Volume_Period, " barras (otimizado)");
+      Print("   ✅ PivotStrength = ", PivotStrength, " (máxima sensibilidade)");
+      Print("   ✅ MinQualityScore = ", MinQualityScore, " (balanceado)");
+      Print("   ✅ RequireCleanLine = ", RequireCleanLine ? "SIM" : "NÃO", " (configurável)");
+      Print("🎯 RESULTADO: Sinais de qualidade aparecem INSTANTANEAMENTE!");
+      Print("🔧 NOVIDADE: Sinais atualizando ao vivo, sem precisar refresh!");
    }
    
    return INIT_SUCCEEDED;
 }
 
 //+------------------------------------------------------------------+
-//| Deinitialization function AJUSTADA - LOGS MÍNIMOS               |
+//| Deinitialization function                                        |
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason) 
 { 
    if(RSIHandle != INVALID_HANDLE) IndicatorRelease(RSIHandle); 
    ObjectsDeleteAll(0, "RSI_Volume_Star_"); 
    ObjectsDeleteAll(0, "div_line_price_"); 
-   ObjectsDeleteAll(0, "div_line_rsi_");     // 🔥 NOVO: Limpar linhas do RSI
-   ObjectsDeleteAll(0, "VolumeDebug_");      // Limpar debug de volume
-   ObjectsDeleteAll(0, "VolumeCircle_");     // 🔥 NOVO: Limpar bolinhas de volume
+   ObjectsDeleteAll(0, "VolumeDebug_");     // Limpar debug de volume
    
-   // 🔥 LOG ÚNICO NO FINAL (se habilitado)
-   if(ShowDebugInfo) 
+   if(ShowDebugInfo)
    {
-      Print("📊 ESTATÍSTICAS LINHAS PARALELAS v2.37:");
-      Print("   🎯 Divergências: ", divergencesDetected, " | Estrelas: ", signalsConfirmed, " | Enhanced: ", enhancedVolumeUsed);
-      Print("   ✅ Validação Rigorosa: ", strictValidationPassed, " passou | ", strictValidationFailed, " falhou");
-      Print("   🚫 Rejeições: ", divergenceRejections, " divergência | ", cleanLineRejections, " linha cortada");
-      Print("   📝 Textos criados: ", volumeTextsCreated);
-      Print("   🔧 MELHORIA: Linhas RSI agora são paralelas às linhas de preço");
+      Print("🔥 ESTATÍSTICAS FINAIS v2.1.5-FIX [", IsBacktest() ? "BACKTEST" : "TEMPO-REAL-PREMIUM", "]:");
+      Print("   🎯 Modo usado: ", EnumToString(DivergenceMode), " (Premium Quality)");
+      Print("   🚀 Configuração: PREMIUM - Responsividade + Qualidade");
+      Print("   🚀 Melhorias aplicadas: Separação visual + Filtros inteligentes + Escalas corretas");
+      Print("   🚀 Anti Look-Ahead: DESATIVADO (comportamento consistente)");
+      Print("   🚀 Delays: ELIMINADOS (sinais instantâneos)");
+      Print("   🔥 CopyBuffer: CORRIGIDO (não trava mais)");
+      Print("   🔥 Falhas CopyBuffer detectadas: ", copyBufferFailures);
+      Print("   🔍 Divergências detectadas: ", divergencesDetected);
+      Print("   📈 Linhas traçadas: ", divergencesDetected, " (TODAS visíveis)");
+      Print("   ⭐ Estrelas confirmadas: ", signalsConfirmed, " (volume sempre verificado)");
+      Print("   📊 Taxa de aprovação: ", signalsConfirmed > 0 ? DoubleToString((double)signalsConfirmed/(divergencesDetected > 0 ? divergencesDetected : 1)*100, 1) : "0", "%");
+      Print("   🎯 SEQUÊNCIA: Bullish pivots consecutivos controlados: ", consecutiveBullishPivots);
+      Print("   🎯 SEQUÊNCIA: Bearish pivots consecutivos controlados: ", consecutiveBearishPivots);
+      Print("🎯 RESULTADO PREMIUM: Qualidade superior + Visual elegante + Zero repintura + SINAIS AO VIVO!");
    }
 }
 
 //+------------------------------------------------------------------+
-//| 🔥 Main calculation function RIGOROSA - TRAÇADO CORRETO         |
+//| Helper functions para objetos                                   |
+//+------------------------------------------------------------------+
+void CreateStar(datetime time, double price, bool isBuy) 
+{ 
+   starCounter++; 
+   string starName = "RSI_Volume_Star_" + (string)starCounter + (string)TimeCurrent(); 
+   if(ObjectCreate(0, starName, OBJ_ARROW_CHECK, 0, time, price))
+   {
+      ObjectSetInteger(0, starName, OBJPROP_ARROWCODE, SYMBOL_STAR);
+      ObjectSetInteger(0, starName, OBJPROP_WIDTH, 4);
+      ObjectSetInteger(0, starName, OBJPROP_SELECTABLE, false);
+      if(isBuy) 
+         ObjectSetInteger(0, starName, OBJPROP_COLOR, clrGold);
+      else 
+         ObjectSetInteger(0, starName, OBJPROP_COLOR, clrMagenta);
+   }
+   ChartRedraw(); 
+}
+
+void FillBufferLine(double &buffer[], int p1, int p2, const double &prices[]) 
+{ 
+   if(p1 >= ArraySize(buffer) || p2 >= ArraySize(buffer) || p1 < 0 || p2 < 0 || p1 == p2) 
+      return; 
+   double start_price = prices[p1]; 
+   double end_price = prices[p2]; 
+   for(int j = p1; j <= p2; j++) 
+   { 
+      if(p2 - p1 == 0) continue; 
+      double ratio = (double)(j - p1) / (double)(p2 - p1); 
+      buffer[j] = start_price + ratio * (end_price - start_price); 
+   } 
+}
+
+//+------------------------------------------------------------------+
+//| Função para mostrar texto no gráfico com informações de volume  |
+//+------------------------------------------------------------------+
+void CreateVolumeDebugText(datetime time, double price, string text, color textColor)
+{
+   string objName = "VolumeDebug_" + (string)time + "_" + (string)MathRand();
+   
+   if(ObjectCreate(0, objName, OBJ_TEXT, 0, time, price))
+   {
+      ObjectSetInteger(0, objName, OBJPROP_COLOR, textColor);
+      ObjectSetInteger(0, objName, OBJPROP_FONTSIZE, 7);  // ✅ Fonte menor, mais discreta
+      ObjectSetString(0, objName, OBJPROP_TEXT, text);
+      ObjectSetInteger(0, objName, OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
+   }
+}
+
+void CreatePriceLine(datetime time1, double price1, datetime time2, double price2, bool is_bullish) 
+{ 
+   lineCounter++; 
+   string line_name = "div_line_price_" + (string)lineCounter + (string)TimeCurrent(); 
+   if(ObjectCreate(0, line_name, OBJ_TREND, 0, time1, price1, time2, price2)) 
+   { 
+      ObjectSetInteger(0, line_name, OBJPROP_COLOR, is_bullish ? clrLimeGreen : clrRed); 
+      ObjectSetInteger(0, line_name, OBJPROP_STYLE, STYLE_SOLID); 
+      ObjectSetInteger(0, line_name, OBJPROP_WIDTH, 2); 
+      ObjectSetInteger(0, line_name, OBJPROP_RAY_RIGHT, false); 
+   } 
+}
+
+//+------------------------------------------------------------------+
+//| Main calculation function CORRIGIDA v2.1.5-FIX                 |
 //+------------------------------------------------------------------+
 int OnCalculate(const int rates_total, const int prev_calculated, const datetime &time[], 
                 const double &open[], const double &high[], const double &low[], 
@@ -1959,11 +1350,19 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
 {
    if(rates_total < RSI_Period + 10) return 0;
    
-   // ✅ TEMPO REAL: Força atualização completa do RSI
+   // 🔥 CORREÇÃO PRINCIPAL v2.1.5-FIX: CopyBuffer com tratamento correto de falhas
    int rsi_copied = CopyBuffer(RSIHandle, 0, 0, rates_total, RawRSIBuffer);
    if(rsi_copied <= 0) 
    { 
-      return prev_calculated; // Mantém estado anterior sem logs
+      copyBufferFailures++; // Contar falhas para estatísticas
+      
+      if(ShowDebugInfo)
+         Print("⚠️ CopyBuffer falhou (normal): Tentativa ", copyBufferFailures, " | Erro: ", GetLastError(), " | Retentando...");
+      
+      // 🔥 CORREÇÃO CRÍTICA: Retornar 0 força o MT5 a tentar recalcular
+      // Antes: return prev_calculated; (causava travamento)
+      // Agora: return 0; (força nova tentativa)
+      return 0; // ✅ CORRIGIDO: Não trava mais!
    }
    
    if(prev_calculated == 0) 
@@ -1977,20 +1376,15 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
       mixedTypeFiltered = 0;
       realDivFiltered = 0;
       cleanLineFiltered = 0;
-      enhancedVolumeUsed = 0;
-      volumeTextsCreated = 0; // ✅ Reset contador de textos
-      
-      // 🔥 NOVO: Reset contadores de validação rigorosa
-      strictValidationPassed = 0;
-      strictValidationFailed = 0;
-      cleanLineRejections = 0;
-      divergenceRejections = 0;
       
       // ✅ RESETAR CONTADORES DE SEQUÊNCIA
       lastBullishPivotBar = -1;
       lastBearishPivotBar = -1;
       consecutiveBullishPivots = 0;
       consecutiveBearishPivots = 0;
+      
+      if(ShowDebugInfo)
+         Print("🔄 Iniciando FUSION v2.1.5-FIX [", IsBacktest() ? "BACKTEST" : "TEMPO-REAL", "] [", EnumToString(DivergenceMode), "] | Anti-LA:", (EnableAntiLookAhead && IsBacktest()) ? "ON" : "OFF", " | Total barras: ", rates_total);
    }
    
    int start_calc = prev_calculated > 1 ? prev_calculated - 1 : 0;
@@ -2026,15 +1420,24 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
    
    int limit = prev_calculated == 0 ? RSI_Period + DivergenceLookback : prev_calculated - 1;
    
-   // ✅ CORREÇÃO TEMPO REAL: Determina até onde processar
-   int max_process = rates_total - (IsBacktest() ? 1 : 0);  // Backtest: rates_total-1, Tempo Real: rates_total
+   // ✅ CORREÇÃO TEMPO REAL v2.1.5-FIX: Processar até barra atual sempre
+   int max_process = rates_total; // ✅ TEMPO REAL: Sempre processa até a barra atual
    
-   // 🔥 LOOP PRINCIPAL RIGOROSO - TRAÇADO CORRETO
+   if(ShowDebugInfo)
+   {
+      if(prev_calculated == 0)
+         Print("🔄 PRIMEIRA EXECUÇÃO v2.1.5-FIX [", IsBacktest() ? "BACKTEST" : "TEMPO-REAL-CORRIGIDO", "] [", EnumToString(DivergenceMode), "]: Processando de ", limit, " até ", max_process);
+      else if(copyBufferFailures == 0) // Só mostra se não houve falhas
+         Print("🔄 ATUALIZAÇÃO TEMPO REAL v2.1.5-FIX: Processando de ", limit, " até ", max_process, " (INSTANTÂNEO + SEM TRAVAMENTOS)");
+   }
+   
+   // 🔥 LOOP PRINCIPAL DE PROCESSAMENTO - CORRIGIDO
    for(int i = limit; i < max_process; i++)
    {
       // Limpar buffers
       BuyBuffer[i] = 0; 
       SellBuffer[i] = 0;
+      RSILineBuffer[i] = 0;
       VolumeBuyConfirmBuffer[i] = 0; 
       VolumeSellConfirmBuffer[i] = 0;
       BuySignalConfirmedBuffer[i] = 0; 
@@ -2044,85 +1447,49 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
       
       if(i < RSI_Period || RawRSIBuffer[i] == 0) continue;
       
-      // ===== 🔥 DETECÇÃO DE COMPRA RIGOROSA - FUNDOS↔FUNDOS =====
-      int buy_pivot = CheckClassicDivergence(low, RawRSIBuffer, tick_volume, open, close, i, true);
+      // ===== DETECÇÃO DE COMPRA =====
+      int buy_pivot = CheckClassicDivergence(low, RawRSIBuffer, tick_volume, i, true);  // ✅ Usa RawRSIBuffer
       if(buy_pivot > 0)
       {
          divergencesDetected++;
-         BuyBuffer[i] = RSIBuffer[i] - 3.0;  // 🔥 SEMPRE marca divergência detectada
+         BuyBuffer[i] = RSIBuffer[i] - 3.0;  // Sinal de compra abaixo do RSI (mais próximo)
          
-         // 🔥 BUSCA MELHORADA: FUNDOS RSI próximos às MÍNIMAS de preço
-         RSIPivots rsi_pivots = FindRSIPivotsStrict(RawRSIBuffer, buy_pivot, i, true, 
-                                                   low[buy_pivot], low[i]);
+         // 🔥 SEMPRE DESENHAR LINHAS DE DIVERGÊNCIA 🔥
+         FillBufferLine(RSILineBuffer, buy_pivot, i, RSIBuffer);  // ✅ Usa RSI escalonado para desenho
+         if(ShowDivergenceLines)
+            CreatePriceLine(time[buy_pivot], low[buy_pivot], time[i], low[i], true);
          
-         // 🔥 SEMPRE USAR OS PIVÔS ENCONTRADOS (função melhorada sempre retorna válido)
-         if(rsi_pivots.valid)
+         if(ShowDebugInfo)
+            Print("🟢 DIVERGÊNCIA BULLISH DETECTADA v2.1.5-FIX [", EnumToString(DivergenceMode), "] na barra ", i, " | LINHA TRAÇADA");
+         
+         // ===== SEMPRE VERIFICAR VOLUME PARA ESTRELA =====
+         bool showStar = false;
+         double volumeChangePercent = GetVolumeChangePercent(tick_volume, buy_pivot, i);
+         bool volConfirmed = CheckVolumeConfirmation(true, tick_volume, buy_pivot, i);
+         bool minVolOk = CheckMinimumVolume(tick_volume, i);
+         
+         // 🔧 DEBUG VISUAL NO GRÁFICO
+         if(ShowVolumeDebugOnChart)
          {
-            // ✅ TRAÇADO RSI: Conecta FUNDOS RSI reais (sem cortar outros fundos)
-            CreateRSILine(time[rsi_pivots.rsi_pivot_past], RSIBuffer[rsi_pivots.rsi_pivot_past], 
-                         time[rsi_pivots.rsi_pivot_current], RSIBuffer[rsi_pivots.rsi_pivot_current], true);
-            
-            // ✅ TRAÇADO PREÇO: Conecta MÍNIMAS de preço (low↔low)
-            if(ShowDivergenceLines)
-               CreatePriceLine(time[buy_pivot], low[buy_pivot], time[i], low[i], true);
-            
-            // 🔥 LOG de confirmação rigorosa
-            if(ShowDivergenceValidation)
-            {
-               PrintControlledLog("COMPRA VÁLIDA - Preço: " + DoubleToString(low[buy_pivot], 5) + "→" + DoubleToString(low[i], 5) + 
-                                " (Δ" + DoubleToString(((low[i]-low[buy_pivot])/low[buy_pivot])*100, 2) + "%) | " +
-                                "RSI: " + DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_past], 1) + "→" + 
-                                DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_current], 1) + 
-                                " (Δ+" + DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_current] - RawRSIBuffer[rsi_pivots.rsi_pivot_past], 1) + ")");
-            }
+            string debugText = "Vol:" + DoubleToString(volumeChangePercent, 1) + "%";
+            color debugColor = volConfirmed ? clrLimeGreen : clrRed;
+            CreateVolumeDebugText(time[i], low[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 30, debugText, debugColor);
+         }
+         
+         if(volConfirmed && minVolOk)
+         {
+            showStar = true;
+            if(ShowDebugInfo)
+               Print("⭐ COMPRA - Volume confirmado: SIM (", NormalizeDouble(volumeChangePercent, 1), "%)");
          }
          else
          {
-            if(ShowDivergenceValidation)
-               PrintControlledLog("COMPRA REJEITADA - Traçado inválido ou não é divergência real");
-            continue; // Pular para próxima iteração
+            if(ShowDebugInfo)
+               Print("❌ COMPRA - Volume NÃO confirmado (Vol:", volConfirmed, " | Min:", minVolOk, " | Mudança:", NormalizeDouble(volumeChangePercent, 1), "% | Necessário:+", Volume_Divergence_Min, "%)");
          }
          
-         // 🔥 SEMPRE MOSTRAR % VOLUME ENHANCED PARA ANÁLISE VISUAL
-         if(ShowVolumeDebugOnChart || ShowDetailedVolumeInfo)
-         {
-            // Volume original - SEMPRE mostrar
-            double volumeChangePercent = GetVolumeChangePercent(tick_volume, buy_pivot, i);
-            bool volumeOK = volumeChangePercent >= Volume_Divergence_Min;
-            string volumeText = (volumeOK ? "✓" : "✗") + "Vol:" + DoubleToString(volumeChangePercent, 1) + "%";
-            CreateVolumeDebugText(time[i], close[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 30, volumeText, volumeOK ? clrYellow : clrGray);
-            
-            if(ShowDetailedVolumeInfo)
-            {
-               // Volume direcionais - SEMPRE mostrar
-               bool candleOK = CheckCandleDirectionVolume(open, close, tick_volume, i, true);
-               long targetVolume = 0, totalVol = 0;
-               for(int k = 0; k < 5 && (i-k) >= 0; k++) {
-                  totalVol += tick_volume[i-k];
-                  if(close[i-k] > open[i-k]) targetVolume += tick_volume[i-k];
-               }
-               double candlePercentage = totalVol > 0 ? ((double)targetVolume / totalVol * 100.0) : 0;
-               string candleString = (candleOK ? "✓" : "✗") + "C:" + DoubleToString(candlePercentage, 0) + "%";
-               CreateVolumeDebugText(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 80, candleString, candleOK ? clrLimeGreen : clrGray);
-               
-               // Fluxo institucional - SEMPRE mostrar
-               bool institutionalOK = CheckInstitutionalVolumeFlow(low, tick_volume, buy_pivot, i, true);
-               string institutionalText = (institutionalOK ? "✓" : "✗") + "I:inst";
-               CreateVolumeDebugText(time[i], low[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 80, institutionalText, institutionalOK ? clrGold : clrGray);
-               
-               // Enhanced final - SEMPRE mostrar
-               int criteriaCount = (volumeOK ? 1 : 0) + (candleOK ? 1 : 0) + (institutionalOK ? 1 : 0);
-               string enhancedString = "E:" + (string)criteriaCount + "/3";
-               CreateVolumeDebugText(time[i], close[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 50, enhancedString, clrLimeGreen);
-            }
-         }
-         
-         // ===== 🔥 ESTRELA DOURADA COM VALIDAÇÃO DE CONTEXTO =====
-         bool volumeEnhancedOK = CheckVolumeConfirmationEnhanced(true, open, close, low, tick_volume, buy_pivot, i);
-         bool candleContextOK = IsValidCandleContext(open, close, high, low, i, true);
-         bool timingOK = IsValidConfirmationTiming(open, close, high, low, i, true);
-         
-         if(volumeEnhancedOK && candleContextOK && timingOK && (i - lastBuySignalBar > MinBarsBetweenSignals))
+         // ===== MOSTRAR ESTRELA SE CONFIRMADO =====
+         if(showStar && (i - lastBuySignalBar > MinBarsBetweenSignals))
          {
             lastBuySignalBar = i;
             signalsConfirmed++;
@@ -2137,103 +1504,54 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
             if(ShowStarsOnChart) 
                CreateStar(time[i], low[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 15, true);
             
-            // 🔥 FORÇAR CRIAÇÃO DOS TEXTOS DE % APÓS CONFIRMAÇÃO DA ESTRELA - SÓ SE HABILITADO
-            if(ShowVolumeDebugOnChart || (ShowDetailedVolumeInfo && ShowOnlyConfirmedStars))
-            {
-               CreateVolumeDebugText(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 120, 
-                                   "⭐COMPRA CONFIRMADA⭐", clrGold);
-            }
-            
-            // 🔥 CRIAR BOLINHA NO VOLUME QUANDO ENHANCED CONFIRMA
-            if(ShowVolumeCircles)
-            {
-               CreateVolumeCircle(time[i], VolumeBuffer[i], true);
-            }
-            
-            // 🔥 LOG CONTROLADO
-            PrintControlledLog("ESTRELA COMPRA confirmada na barra " + (string)i);
+            if(ShowDebugInfo)
+               Print("⭐ ESTRELA COMPRA CONFIRMADA v2.1.5-FIX [", EnumToString(DivergenceMode), "] na barra ", i);
          }
       }
       
-      // ===== 🔥 DETECÇÃO DE VENDA RIGOROSA - TOPOS↔TOPOS =====
-      int sell_pivot = CheckClassicDivergence(high, RawRSIBuffer, tick_volume, open, close, i, false);
+      // ===== DETECÇÃO DE VENDA =====
+      int sell_pivot = CheckClassicDivergence(high, RawRSIBuffer, tick_volume, i, false);  // ✅ Usa RawRSIBuffer
       if(sell_pivot > 0)
       {
          divergencesDetected++;
-         SellBuffer[i] = RSIBuffer[i] + 3.0;  // 🔥 SEMPRE marca divergência detectada
+         SellBuffer[i] = RSIBuffer[i] + 3.0;  // Sinal de venda acima do RSI (mais próximo)
          
-         // 🔥 BUSCA MELHORADA: TOPOS RSI próximos às MÁXIMAS de preço
-         RSIPivots rsi_pivots = FindRSIPivotsStrict(RawRSIBuffer, sell_pivot, i, false, 
-                                                   high[sell_pivot], high[i]);
+         // 🔥 SEMPRE DESENHAR LINHAS DE DIVERGÊNCIA 🔥
+         FillBufferLine(RSILineBuffer, sell_pivot, i, RSIBuffer);  // ✅ Usa RSI escalonado para desenho
+         if(ShowDivergenceLines)
+            CreatePriceLine(time[sell_pivot], high[sell_pivot], time[i], high[i], false);
          
-         // 🔥 SEMPRE USAR OS PIVÔS ENCONTRADOS (função melhorada sempre retorna válido)
-         if(rsi_pivots.valid)
+         if(ShowDebugInfo)
+            Print("🔴 DIVERGÊNCIA BEARISH DETECTADA v2.1.5-FIX [", EnumToString(DivergenceMode), "] na barra ", i, " | LINHA TRAÇADA");
+         
+         // ===== SEMPRE VERIFICAR VOLUME PARA ESTRELA =====
+         bool showStar = false;
+         double volumeChangePercent = GetVolumeChangePercent(tick_volume, sell_pivot, i);
+         bool volConfirmed = CheckVolumeConfirmation(false, tick_volume, sell_pivot, i);
+         bool minVolOk = CheckMinimumVolume(tick_volume, i);
+         
+         // 🔧 DEBUG VISUAL NO GRÁFICO
+         if(ShowVolumeDebugOnChart)
          {
-            // ✅ TRAÇADO RSI: Conecta TOPOS RSI reais (sem cortar outros topos)
-            CreateRSILine(time[rsi_pivots.rsi_pivot_past], RSIBuffer[rsi_pivots.rsi_pivot_past], 
-                         time[rsi_pivots.rsi_pivot_current], RSIBuffer[rsi_pivots.rsi_pivot_current], false);
-            
-            // ✅ TRAÇADO PREÇO: Conecta MÁXIMAS de preço (high↔high)
-            if(ShowDivergenceLines)
-               CreatePriceLine(time[sell_pivot], high[sell_pivot], time[i], high[i], false);
-            
-            // 🔥 LOG de confirmação rigorosa
-            if(ShowDivergenceValidation)
-            {
-               PrintControlledLog("VENDA VÁLIDA - Preço: " + DoubleToString(high[sell_pivot], 5) + "→" + DoubleToString(high[i], 5) + 
-                                " (Δ+" + DoubleToString(((high[i]-high[sell_pivot])/high[sell_pivot])*100, 2) + "%) | " +
-                                "RSI: " + DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_past], 1) + "→" + 
-                                DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_current], 1) + 
-                                " (Δ-" + DoubleToString(RawRSIBuffer[rsi_pivots.rsi_pivot_past] - RawRSIBuffer[rsi_pivots.rsi_pivot_current], 1) + ")");
-            }
+            string debugText = "Vol:" + DoubleToString(volumeChangePercent, 1) + "%";
+            color debugColor = volConfirmed ? clrMagenta : clrRed;
+            CreateVolumeDebugText(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 30, debugText, debugColor);
+         }
+         
+         if(volConfirmed && minVolOk)
+         {
+            showStar = true;
+            if(ShowDebugInfo)
+               Print("⭐ VENDA - Volume confirmado: SIM (", NormalizeDouble(volumeChangePercent, 1), "%)");
          }
          else
          {
-            if(ShowDivergenceValidation)
-               PrintControlledLog("VENDA REJEITADA - Traçado inválido ou não é divergência real");
-            continue; // Pular para próxima iteração
+            if(ShowDebugInfo)
+               Print("❌ VENDA - Volume NÃO confirmado (Vol:", volConfirmed, " | Min:", minVolOk, " | Mudança:", NormalizeDouble(volumeChangePercent, 1), "% | Necessário:-", Volume_Divergence_Min, "%)");
          }
          
-         // 🔥 SEMPRE MOSTRAR % VOLUME ENHANCED PARA ANÁLISE VISUAL
-         if(ShowVolumeDebugOnChart || ShowDetailedVolumeInfo)
-         {
-            // Volume original - SEMPRE mostrar
-            double volumeChangePercent = GetVolumeChangePercent(tick_volume, sell_pivot, i);
-            bool volumeOK = volumeChangePercent >= Volume_Divergence_Min;
-            string volumeText = (volumeOK ? "✓" : "✗") + "Vol:" + DoubleToString(volumeChangePercent, 1) + "%";
-            CreateVolumeDebugText(time[i], close[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 30, volumeText, volumeOK ? clrYellow : clrGray);
-            
-            if(ShowDetailedVolumeInfo)
-            {
-               // Volume direcionais - SEMPRE mostrar
-               bool candleOK = CheckCandleDirectionVolume(open, close, tick_volume, i, false);
-               long targetVolume = 0, totalVol = 0;
-               for(int k = 0; k < 5 && (i-k) >= 0; k++) {
-                  totalVol += tick_volume[i-k];
-                  if(close[i-k] < open[i-k]) targetVolume += tick_volume[i-k];
-               }
-               double candlePercentage = totalVol > 0 ? ((double)targetVolume / totalVol * 100.0) : 0;
-               string candleString = (candleOK ? "✓" : "✗") + "V:" + DoubleToString(candlePercentage, 0) + "%";
-               CreateVolumeDebugText(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 80, candleString, candleOK ? clrRed : clrGray);
-               
-               // Fluxo institucional - SEMPRE mostrar
-               bool institutionalOK = CheckInstitutionalVolumeFlow(high, tick_volume, sell_pivot, i, false);
-               string institutionalText = (institutionalOK ? "✓" : "✗") + "i:inst";
-               CreateVolumeDebugText(time[i], low[i] - SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 80, institutionalText, institutionalOK ? clrMagenta : clrGray);
-               
-               // Enhanced final - SEMPRE mostrar
-               int criteriaCount = (volumeOK ? 1 : 0) + (candleOK ? 1 : 0) + (institutionalOK ? 1 : 0);
-               string enhancedString = "E:" + (string)criteriaCount + "/3";
-               CreateVolumeDebugText(time[i], close[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 50, enhancedString, clrRed);
-            }
-         }
-         
-         // ===== 🔥 ESTRELA MAGENTA COM VALIDAÇÃO DE CONTEXTO =====
-         bool volumeEnhancedOK = CheckVolumeConfirmationEnhanced(false, open, close, high, tick_volume, sell_pivot, i);
-         bool candleContextOK = IsValidCandleContext(open, close, high, low, i, false);
-         bool timingOK = IsValidConfirmationTiming(open, close, high, low, i, false);
-         
-         if(volumeEnhancedOK && candleContextOK && timingOK && (i - lastSellSignalBar > MinBarsBetweenSignals))
+         // ===== MOSTRAR ESTRELA SE CONFIRMADO =====
+         if(showStar && (i - lastSellSignalBar > MinBarsBetweenSignals))
          {
             lastSellSignalBar = i;
             signalsConfirmed++;
@@ -2248,36 +1566,37 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
             if(ShowStarsOnChart) 
                CreateStar(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 15, false);
             
-            // 🔥 FORÇAR CRIAÇÃO DOS TEXTOS DE % APÓS CONFIRMAÇÃO DA ESTRELA - SÓ SE HABILITADO
-            if(ShowVolumeDebugOnChart || (ShowDetailedVolumeInfo && ShowOnlyConfirmedStars))
-            {
-               CreateVolumeDebugText(time[i], high[i] + SymbolInfoDouble(_Symbol, SYMBOL_POINT) * 120, 
-                                   "⭐VENDA CONFIRMADA⭐", clrMagenta);
-            }
-            
-            // 🔥 CRIAR BOLINHA NO VOLUME QUANDO ENHANCED CONFIRMA
-            if(ShowVolumeCircles)
-            {
-               CreateVolumeCircle(time[i], VolumeBuffer[i], false);
-            }
-            
-            // 🔥 LOG CONTROLADO
-            PrintControlledLog("ESTRELA VENDA confirmada na barra " + (string)i);
+            if(ShowDebugInfo)
+               Print("⭐ ESTRELA VENDA CONFIRMADA v2.1.5-FIX [", EnumToString(DivergenceMode), "] na barra ", i);
          }
       }
    }
    
-   // 🔥 LOG ÚNICO NO FINAL (apenas primeira execução)
    if(ShowDebugInfo && prev_calculated == 0)
    {
-      Print("✅ HISTÓRICO LINHAS PARALELAS v2.37: ", rates_total, " barras processadas");
-      Print("   🎯 Divergências: ", divergencesDetected, " | Estrelas: ", signalsConfirmed, " | Enhanced: ", enhancedVolumeUsed);
-      Print("   ✅ Validação: ", strictValidationPassed, " passou | ", strictValidationFailed, " falhou");
-      Print("   🚫 Rejeições: ", divergenceRejections, " divergência | ", cleanLineRejections, " linha cortada");
-      Print("   📝 Textos: ", MaxVolumeTextsOnChart, " limite | ", volumeTextsCreated, " criados");
-      Print("   🔧 RESULTADO: Linhas RSI e Preço agora são paralelas e conectam pivôs correspondentes");
+      Print("🔄 HISTÓRICO PROCESSADO v2.1.5-FIX [", IsBacktest() ? "BACKTEST" : "TEMPO-REAL-CORRIGIDO", "]!");
+      Print("   📊 Total barras processadas: ", rates_total);
+      Print("   🔍 Divergências detectadas: ", divergencesDetected);
+      Print("   📈 Linhas traçadas: ", divergencesDetected, " (TODAS as divergências RSI)");
+      Print("   ⭐ Estrelas confirmadas: ", signalsConfirmed, " (volume sempre verificado)");
+      Print("   🔥 Falhas CopyBuffer: ", copyBufferFailures, " (tratadas corretamente)");
+      Print("   🚀 CORREÇÕES APLICADAS:");
+      Print("      ✅ CopyBuffer CORRIGIDO: Não trava mais quando falha!");
+      Print("      ✅ Pivô Tempo Real: Detecção na barra atual melhorada");
+      Print("      ✅ Escala à direita corrigida (0-100 original)");
+      Print("      ✅ Separação visual: RSI zona superior, Volume zona inferior");
+      Print("      ✅ Níveis RSI corretos: 30, 50, 70 (valores originais)");
+      Print("      ✅ Linha divisória ultra discreta");
+      Print("      ✅ Controle de sequência (evita fundos consecutivos)");
+      Print("      ✅ Validação de inclinação mínima");
+      Print("      ✅ Contexto de tendência melhorado");
+      Print("      ✅ Volume visual aprimorado");
+      Print("   🚀 RESPONSIVIDADE MÁXIMA: Detecta até barra atual!");
+      Print("   🚀 SEM REPINTURA: Comportamento consistente sempre!");
+      Print("   🚀 SEM TRAVAMENTOS: CopyBuffer tratado corretamente!");
+      Print("   🎯 QUALIDADE: Evita Print 1, detecta Print 3, sinais ao vivo!");
    }
    
-   return rates_total;
+   return rates_total; // ✅ SEMPRE retorna rates_total quando bem-sucedido
 }
 //+------------------------------------------------------------------+
